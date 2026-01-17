@@ -6,48 +6,116 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// 1. Struct Handler
-// Isinya cuma satu: Dia butuh "Koki" (Usecase) siapa yang bakal dia suruh-suruh.
+// 1. SI PELAYAN
 type PostHandler struct {
-	PostUsecase domain.PostUseCase
+	// Dia megang kontak Si Bos (Usecase)
+	postUseCase domain.PostUseCase
 }
 
-// 2. Constructor
-// Ini buat "ngelamar" si pelayan kerja. Pas dia kerja, dia dikasih tau siapa kokinya.
-func NewPostHandler(app *fiber.App, usecase domain.PostUseCase) {
+// 2. REKRUTMEN PELAYAN
+func NewPostHandler(app *fiber.App, u domain.PostUseCase) {
 	handler := &PostHandler{
-		PostUsecase: usecase,
+		postUseCase: u,
 	}
 
-	// Ini Routing-nya (Daftar Menu)
-	// Kalau ada yang akses /posts method POST, panggil fungsi Create
-	app.Post("/posts", handler.Create)
+	// 3. DAFTAR MENU (ROUTING)
+	// "Kalo ada tamu ke meja '/posts', panggil si handler"
+	api := app.Group("/api") // Optional: grouping biar rapi
+	api.Get("/posts", handler.Fetch)
+	api.Get("/posts/:id", handler.GetByID)
+	api.Post("/posts", handler.Store)
+	api.Delete("/posts/:id", handler.Delete)
 }
 
-// 3. Fungsi Nganter Pesanan (Handler Function)
-func (h *PostHandler) Create(c *fiber.Ctx) error {
-	// A. Nerima Pesanan (Parsing Body)
-	var post domain.Post
-	if err := c.BodyParser(&post); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Pesenannya nggak jelas nih (Bad Request)",
-			"error":   err.Error(),
-		})
-	}
+func (h *PostHandler) Fetch(c *fiber.Ctx) error {
+	// 1. CATAT PESANAN TAMBAHAN (Query Param)
+	// Misal: /posts?search=coding
+	keyword := c.Query("search")
 
-	// B. Teriak ke Dapur (Panggil Usecase)
-	// "Eh Usecase, tolong simpenin/masakin data ini dong!"
-	err := h.PostUsecase.Store(&post)
+	// 2. TERIAK KE MANAJER
+	posts, err := h.postUseCase.Fetch(keyword)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Dapur lagi kebakaran (Internal Server Error)",
-			"error":   err.Error(),
+		// Kalau dapur meledak, bilang ke tamu (Internal Server Error)
+		return c.Status(500).JSON(fiber.Map{
+			"message": err.Error(),
 		})
 	}
 
-	// C. Nganter Makanan (Response Sukses)
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "Siap! Postingan udah tayang ya kakak",
-		"data":    post,
+	// 3. SAJIKAN MAKANAN (200 OK)
+	return c.Status(200).JSON(posts)
+}
+
+func (h *PostHandler) Store(c *fiber.Ctx) error {
+	// 1. SIAPIN PIRING KOSONG
+	var post domain.Post
+
+	// 2. TERIMA BAHAN DARI TAMU (Parsing Body)
+	// Tamu ngirim JSON: {"title": "Halo", "content": "..."}
+	// Kita tuang ke piring 'post'
+	if err := c.BodyParser(&post); err != nil {
+		// Kalau tamunya ngirim sampah (JSON rusak), marahin (Bad Request)
+		return c.Status(400).JSON(fiber.Map{
+			"message": "Data lu ngaco bro: " + err.Error(),
+		})
+	}
+
+	// 3. KASIH KE MANAJER
+	if err := h.postUseCase.Store(&post); err != nil {
+		// Kalau validasi Manajer gagal (misal judul kosong)
+		return c.Status(500).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	// 4. BILANG SUKSES (201 Created)
+	return c.Status(201).JSON(fiber.Map{
+		"message": "Mantap, postingan udah tayang!",
+	})
+}
+
+func (h *PostHandler) GetByID(c *fiber.Ctx) error {
+	// 1. AMBIL NOMOR MEJA (ID dari URL)
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"message": "ID harus angka woy"})
+	}
+
+	// 2. PANGGIL MANAJER
+	post, err := h.postUseCase.GetByID(id)
+	if err != nil {
+		// Asumsi simpel: Kalau error berarti gak ketemu (404)
+		// (Nanti bisa didetailin lagi logic error-nya)
+		return c.Status(404).JSON(fiber.Map{
+			"message": "Waduh, postingan ilang bro.",
+		})
+	}
+
+	return c.Status(200).JSON(post)
+}
+
+func (h *PostHandler) Delete(c *fiber.Ctx) error {
+	// 1. AMBIL NOMOR MEJA (ID dari URL)
+	// Contoh: DELETE /api/posts/5
+	id, err := c.ParamsInt("id")
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"message": "ID-nya mana woy, harus angka ya!",
+		})
+	}
+
+	// 2. TERIAK KE MANAJER (Usecase)
+	// "Bos, hapus data nomor 5!"
+	err = h.postUseCase.Delete(id)
+	if err != nil {
+		// Bisa jadi error karena ID gak ketemu, atau DB error
+		return c.Status(500).JSON(fiber.Map{
+			"message": "Gagal hapus bro: " + err.Error(),
+		})
+	}
+
+	// 3. LAPORAN SUKSES
+	// Biasanya kalau delete sukses, kita kasih pesan simple aja.
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Mantap, postingan udah lenyap dari muka bumi.",
 	})
 }
