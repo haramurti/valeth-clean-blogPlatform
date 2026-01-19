@@ -1,9 +1,9 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valeth's Digital Garden</title>
+    <title>kuma blog </title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -81,7 +81,6 @@
         }
 
         .nav-links a:hover { color: var(--accent); text-decoration: underline; }
-        .logout-btn { color: #ff6b6b; } /* Merah dikit buat logout */
 
         /* --- ACTIONS --- */
         .action-bar {
@@ -105,16 +104,16 @@
             flex-direction: column;
             gap: 40px; /* Jarak antar postingan */
         }
+
         .post-item {
-            /* group;  <-- HAPUS BARIS INI, INI TYPO PARAH */
-            display: block; /* Tambahin ini aja biar rapi */
-            transition: transform 0.2s; /* Biar ada animasi dikit pas hover */
+            display: block;
+            transition: transform 0.2s; 
         }
 
-        /* Tambahan dikit biar makin enak pas di-hover satu postingan */
         .post-item:hover {
             transform: translateX(5px); /* Geser kanan dikit pas di-hover */
         }
+
         .post-title {
             font-size: 1.5rem;
             font-weight: 700;
@@ -167,7 +166,6 @@
             font-size: 0.8rem;
             font-family: 'JetBrains Mono', monospace;
         }
-
     </style>
 </head>
 <body>
@@ -175,13 +173,13 @@
     <div class="container">
         <header class="site-header">
             <div class="brand">
-                <h1>kuma-blog くまーブログ.md</h1>
+                <h1>ʕ •ᴥ•ʔ (っ˘ڡ˘ς) kuma-blog くまーブログ.md</h1>
                 <span class="tagline">俺の”ア”女性はかわいすぎて怒ってる猫みたい</span>
                 <span class="tagline" style="font-size: 0.7rem; color: #555;">(Si 'A' jutek tapi cakep, kek kucing ngamuk)</span>
             </div>
             <nav class="nav-links">
                 <a href="/login">[ Login ]</a>
-                </nav>
+            </nav>
         </header>
 
         <div class="action-bar">
@@ -194,7 +192,7 @@
             {{ range . }}
             <article class="post-item">
                 <div class="post-meta">
-                    <span>{{ .Date }}</span>
+                    <span>{{ .CreatedAt.Format "02 Jan 2006" }}</span>
                     <span>•</span>
                     <span>#Uncategorized</span>
                 </div>
@@ -214,7 +212,7 @@
         </div>
 
         <footer>
-            <p>Built with Go & Caffeine by Valeth</p>
+            <p>Built with Go & words by neval</p>
         </footer>
     </div>
 

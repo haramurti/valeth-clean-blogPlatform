@@ -25,6 +25,13 @@ func NewPostHandler(app *fiber.App, u domain.PostUseCase) {
 	api.Get("/posts/:id", handler.GetByID)
 	api.Post("/posts", handler.Store)
 	api.Delete("/posts/:id", handler.Delete)
+
+	app.Get("/", handler.PageHome)             // Buka Home
+	app.Get("/post", handler.PagePostDetail)   // Buka Baca Tulisan
+	app.Get("/login", handler.PageLogin)       // Buka Login
+	app.Get("/register", handler.PageRegister) // Buka Register
+	app.Get("/create", handler.PageCreate)
+
 }
 
 func (h *PostHandler) Fetch(c *fiber.Ctx) error {
@@ -118,4 +125,51 @@ func (h *PostHandler) Delete(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{
 		"message": "Mantap, postingan udah lenyap dari muka bumi.",
 	})
+}
+
+// ... method JSON yang lama (Fetch, Store, dll) biarin aja di atas ...
+
+// ==========================================
+// BAGIAN FRONTEND (RENDER HTML)
+// ==========================================
+
+// 1. HALAMAN DEPAN (HOME)
+func (h *PostHandler) PageHome(c *fiber.Ctx) error {
+	// Panggil Manajer (Usecase) buat ambil data
+	posts, err := h.postUseCase.Fetch("")
+	if err != nil {
+		return c.Status(500).SendString("Error database bro: " + err.Error())
+	}
+
+	// Render file 'index.html' dengan data posts
+	return c.Render("index", posts)
+}
+
+// 2. HALAMAN BACA POSTINGAN (DETAIL)
+func (h *PostHandler) PagePostDetail(c *fiber.Ctx) error {
+	// Ambil ?id=1 dari URL
+	id := c.QueryInt("id")
+
+	post, err := h.postUseCase.GetByID(id)
+	if err != nil {
+		return c.Status(404).Render("404", nil) // Kalo mau niat bikin file 404.html
+	}
+
+	// Render file 'post.html'
+	return c.Render("post", post)
+}
+
+// 3. HALAMAN LOGIN (Cuma nampilin doang)
+func (h *PostHandler) PageLogin(c *fiber.Ctx) error {
+	return c.Render("login", nil)
+}
+
+// 4. HALAMAN REGISTER
+func (h *PostHandler) PageRegister(c *fiber.Ctx) error {
+	return c.Render("register", nil)
+}
+
+// 5. HALAMAN CREATE
+func (h *PostHandler) PageCreate(c *fiber.Ctx) error {
+	return c.Render("create", nil) // Asumsi lu nanti bikin create.html
 }

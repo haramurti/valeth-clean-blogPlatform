@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Entry - Valeth.md</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #1e1e1e;
+            --text-main: #dcddde;
+            --text-muted: #787c88;
+            --accent: #a882ff;
+            --border-color: #363636;
+        }
+        
+        body { 
+            background: var(--bg-main); 
+            color: var(--text-main); 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        .container { 
+            max-width: 720px; 
+            margin: 0 auto; 
+            padding: 40px 24px; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER NAV */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .back-link { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 0.9rem; 
+            color: var(--text-muted); 
+            text-decoration: none; 
+            transition: 0.2s;
+        }
+        .back-link:hover { color: var(--accent); }
+
+        .btn-save {
+            background: var(--accent);
+            color: #1e1e1e;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .btn-save:hover { background: #bfa3ff; transform: translateY(-2px); }
+
+        /* FORM AREA */
+        #createForm {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* INPUT JUDUL (GAYA CLEAN) */
+        .input-title {
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed transparent;
+            color: #fff;
+            font-size: 2.5rem;
+            font-weight: 800;
+            width: 100%;
+            outline: none;
+            padding: 10px 0;
+            font-family: 'Inter', sans-serif;
+            transition: border 0.3s;
+        }
+        .input-title:focus { border-bottom-color: var(--border-color); }
+        .input-title::placeholder { color: #333; }
+
+        /* TEXTAREA CONTENT (GAYA EDITOR) */
+        .input-content {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace; /* Biar kerasa ngoding */
+            font-size: 1.1rem;
+            line-height: 1.6;
+            width: 100%;
+            flex-grow: 1; /* Ngisi sisa layar */
+            resize: none; /* Gak usah resize, udah fullscreen */
+            outline: none;
+            min-height: 400px;
+        }
+        .input-content::placeholder { color: #333; font-style: italic; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <form id="createForm">
+            
+            <div class="top-nav">
+                <a href="/" class="back-link">&larr; Cancel / Abort</a>
+                <button type="submit" class="btn-save">[ SAVE_LOG ]</button>
+            </div>
+
+            <input type="text" id="title" class="input-title" placeholder="Untitled Log..." required autocomplete="off">
+
+            <textarea id="content" class="input-content" placeholder="Start typing system log here..." required></textarea>
+        </form>
+
+    </div>
+
+    <script>
+        document.getElementById('createForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Jangan refresh halaman
+
+            // 1. Ambil data dari input
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const btn = document.querySelector('.btn-save');
+
+            // 2. Ubah tombol jadi Loading
+            const originalText = btn.innerText;
+            btn.innerText = "SAVING...";
+            btn.disabled = true;
+
+            try {
+                // 3. Tembak ke API Backend (Method POST)
+                const response = await fetch('/api/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        content: content
+                    })
+                });
+
+                if (response.ok) {
+                    // 4. Kalau sukses, balik ke Home
+                    window.location.href = "/";
+                } else {
+                    const err = await response.json();
+                    alert("Error: " + err.message);
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Gagal konek ke server.");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
