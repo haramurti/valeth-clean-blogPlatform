@@ -6,40 +6,40 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// 1. SI PELAYAN
+// 1. Bikin struct pelayana
 type PostHandler struct {
-	// Dia megang kontak Si Bos (Usecase)
+	// jadi ini dimana variabel yang mana fungsinya bisa kita pake buat di method nanti.
 	postUseCase domain.PostUseCase
 }
 
-// 2. REKRUTMEN PELAYAN
+// 2. Masukin pelayan
 func NewPostHandler(app *fiber.App, u domain.PostUseCase) {
 	handler := &PostHandler{
 		postUseCase: u,
 	}
 
-	// 3. DAFTAR MENU (ROUTING)
-	// "Kalo ada tamu ke meja '/posts', panggil si handler"
-	api := app.Group("/api") // Optional: grouping biar rapi
+	// 3. Daftar Menu
+	// api ini variable grouping, jadi yang mau dibawah ini harus lewat grouping dahulu
+	api := app.Group("/api")
 	api.Get("/posts", handler.Fetch)
 	api.Get("/posts/:id", handler.GetByID)
 	api.Post("/posts", handler.Store)
 	api.Delete("/posts/:id", handler.Delete)
 
-	app.Get("/", handler.PageHome)             // Buka Home
-	app.Get("/post", handler.PagePostDetail)   // Buka Baca Tulisan
-	app.Get("/login", handler.PageLogin)       // Buka Login
-	app.Get("/register", handler.PageRegister) // Buka Register
+	app.Get("/", handler.PageHome) // Open Home
+	app.Get("/post", handler.PagePostDetail)
+	app.Get("/login", handler.PageLogin)
+	app.Get("/register", handler.PageRegister)
 	app.Get("/create", handler.PageCreate)
 
 }
 
 func (h *PostHandler) Fetch(c *fiber.Ctx) error {
-	// 1. CATAT PESANAN TAMBAHAN (Query Param)
 	// Misal: /posts?search=coding
 	keyword := c.Query("search")
 
-	// 2. TERIAK KE MANAJER
+	// 2. Si pelaayan teriak Ke managaer sambil bawa nampan namanya fiber, dimana dia bisa menerima pesanan user
+	//dan juga bawa nanti makanannya ke customer
 	posts, err := h.postUseCase.Fetch(keyword)
 	if err != nil {
 		// Kalau dapur meledak, bilang ke tamu (Internal Server Error)
@@ -48,40 +48,40 @@ func (h *PostHandler) Fetch(c *fiber.Ctx) error {
 		})
 	}
 
-	// 3. SAJIKAN MAKANAN (200 OK)
+	// 3. Sajikan Makanan (200 OK)
 	return c.Status(200).JSON(posts)
 }
 
 func (h *PostHandler) Store(c *fiber.Ctx) error {
-	// 1. SIAPIN PIRING KOSONG
+	// 1. Siapin piring kosong
 	var post domain.Post
 
-	// 2. TERIMA BAHAN DARI TAMU (Parsing Body)
+	// 2. Dapet bahan bahan dari user.
 	// Tamu ngirim JSON: {"title": "Halo", "content": "..."}
 	// Kita tuang ke piring 'post'
 	if err := c.BodyParser(&post); err != nil {
-		// Kalau tamunya ngirim sampah (JSON rusak), marahin (Bad Request)
+		// if tamunya ngirim sampah (JSON rusak), marahin (Bad Request)
 		return c.Status(400).JSON(fiber.Map{
 			"message": "Data lu ngaco bro: " + err.Error(),
 		})
 	}
 
-	// 3. KASIH KE MANAJER
+	//3. Kasih ke Manajer ngasih tau
 	if err := h.postUseCase.Store(&post); err != nil {
-		// Kalau validasi Manajer gagal (misal judul kosong)
+		// Manajer ngecheck kenapa ini kosong (misal judul kosong)
 		return c.Status(500).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
 
-	// 4. BILANG SUKSES (201 Created)
+	// 4. Berhasil (201 Created)
 	return c.Status(201).JSON(fiber.Map{
 		"message": "Mantap, postingan udah tayang!",
 	})
 }
 
 func (h *PostHandler) GetByID(c *fiber.Ctx) error {
-	// 1. AMBIL NOMOR MEJA (ID dari URL)
+	// 1. Ambil makanan dari nomor resi.
 	id, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"message": "ID harus angka woy"})
@@ -92,9 +92,7 @@ func (h *PostHandler) GetByID(c *fiber.Ctx) error {
 	if err != nil {
 		// Asumsi simpel: Kalau error berarti gak ketemu (404)
 		// (Nanti bisa didetailin lagi logic error-nya)
-		return c.Status(404).JSON(fiber.Map{
-			"message": "Waduh, postingan ilang bro.",
-		})
+		return c.Status(404).Render("404", nil) // Kalo mau niat bikin file 404.html
 	}
 
 	return c.Status(200).JSON(post)
@@ -127,10 +125,10 @@ func (h *PostHandler) Delete(c *fiber.Ctx) error {
 	})
 }
 
-// ... method JSON yang lama (Fetch, Store, dll) biarin aja di atas ...
+// ... method JSON yang lama (Fetch, Store, dll) biarin aja di atas ... jadi ktia bakal pake yang diatas buat yang dibawah
 
 // ==========================================
-// BAGIAN FRONTEND (RENDER HTML)
+// BAGIAN FRONTEND (RENDER HTML) rendering html
 // ==========================================
 
 // 1. HALAMAN DEPAN (HOME)

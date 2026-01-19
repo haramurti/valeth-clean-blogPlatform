@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found - System Error</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Palette Obsidian Dark Mode (Sesuai file index.html kamu) */
+            --bg-main: #1e1e1e;
+            --text-main: #dcddde;
+            --text-muted: #787c88;
+            --accent: #a882ff;
+            --accent-hover: #bfa3ff;
+            --border-color: #363636;
+        }
+
+        body { 
+            background: var(--bg-main); 
+            color: var(--text-main); 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            height: 100vh;
+            display: flex;
+            align-items: center; /* Tengah vertikal */
+            justify-content: center; /* Tengah horizontal */
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px; /* Sedikit lebih sempit dari post biasa biar fokus */
+            padding: 24px;
+        }
+
+        /* TYPOGRAPHY KHAS VALETH.MD */
+        h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 4rem;
+            color: var(--accent);
+            margin: 0;
+            line-height: 1;
+            font-weight: 700;
+        }
+
+        .error-code {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 30px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* MEME CONTAINER */
+        .meme-box {
+            margin: 20px auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            background: #252526;
+            max-width: 100%;
+            display: inline-block; /* Biar kotak ngikutin gambar */
+        }
+
+        .meme-box img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            display: block;
+        }
+
+        /* COPYWRITING ALA RADIT */
+        .message {
+            margin-top: 30px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* TOMBOL (Style campuran btn-save dan login) */
+        .btn-home {
+            margin-top: 40px;
+            display: inline-block;
+            background: var(--accent);
+            color: #1e1e1e;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .btn-home:hover {
+            background: var(--accent-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(168, 130, 255, 0.2);
+        }
+
+        footer {
+            margin-top: 50px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>[ 404 ]</h1>
+        <div class="error-code">ERROR: PAGE_NOT_FOUND_EXCEPTION</div>
+
+        <div class="message">
+            <p><strong>Waduh, canggung nih.</strong></p>
+            <p>Lo nyasar ke halaman yang gak ada, dan gue bingung mau nyuguhin apa. Yaudah, mending liat meme bentar biar kita gak diem-dieman kayak lagi di lift.</p>
+        </div>
+
+        <div class="meme-box">
+            <img src="/static/images/hold-on-i-got-a-meme-for-this.gif" alt="Hold on meme">
+        </div>
+
+        <div>
+            <a href="/" class="btn-home">&lt;/ REBOOT_SYSTEM &gt;</a>
+        </div>
+
+        <footer>
+            // End of process
+        </footer>
+    </div>
+
+</body>
+</html>

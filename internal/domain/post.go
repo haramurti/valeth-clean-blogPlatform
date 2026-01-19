@@ -12,6 +12,8 @@ type Post struct {
 	Tags      []string  `json:"tags" gorm:"type:text[]"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	UserID    uint      `json:"user_id"` // Foreign Key
+	User      User      `json:"user,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 type PostRepository interface {
