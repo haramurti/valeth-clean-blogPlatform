@@ -3,45 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New User Protocol - Register</title>
+    <title>Initialize Protocol - Register</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* (Copy CSS dari Login.html kesini biar sama persis) */
-        :root { --bg-main: #1e1e1e; --text-main: #dcddde; --text-muted: #787c88; --accent: #a882ff; --border-color: #363636; }
+        :root {
+            --bg-main: #1e1e1e; --text-main: #dcddde; --text-muted: #787c88;
+            --accent: #a882ff; --border-color: #363636;
+        }
         body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; }
-        .container { max-width: 400px; margin: 0 auto; margin-top: 80px; }
-        h1 { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; margin-bottom: 30px; text-align: center; }
+        .container { max-width: 400px; margin: 0 auto; margin-top: 60px; }
+        
+        h1 { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; margin-bottom: 10px; text-align: center; color: #fff; }
+        .subtitle { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 30px; font-family: 'JetBrains Mono', monospace; }
+
+        /* AVATAR DARI GOOGLE */
+        .avatar-container { text-align: center; margin-bottom: 20px; display: none; } /* Hidden by default */
+        .avatar-img { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent); }
+
+        /* FORM */
         .form-group { margin-bottom: 20px; }
         label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
-        input { width: 100%; padding: 12px; background: #252526; border: 1px solid var(--border-color); color: white; font-family: 'JetBrains Mono', monospace; border-radius: 4px; outline: none; transition: 0.2s; box-sizing: border-box;}
+        
+        input {
+            width: 100%; padding: 12px; background: #252526; border: 1px solid var(--border-color);
+            color: white; font-family: 'JetBrains Mono', monospace; border-radius: 4px; outline: none;
+            transition: 0.2s; box-sizing: border-box;
+        }
         input:focus { border-color: var(--accent); }
-        button { width: 100%; padding: 12px; background: var(--accent); color: #1e1e1e; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-family: 'JetBrains Mono', monospace; margin-top: 10px; transition: 0.2s; }
-        button:hover { background: #bfa3ff; }
+        
+        /* Kalau inputnya Read Only (hasil auto-fill), warnanya bedain dikit */
+        input[readonly] { background: #1a1a1a; color: #666; cursor: not-allowed; border-style: dashed; }
+
+        button {
+            width: 100%; padding: 12px; background: var(--accent); color: #1e1e1e; font-weight: bold;
+            border: none; border-radius: 4px; cursor: pointer; font-family: 'JetBrains Mono', monospace;
+            margin-top: 10px; transition: 0.2s;
+        }
+        button:hover { background: #bfa3ff; transform: translateY(-2px); }
+
         .links { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); }
         .links a { color: var(--accent); text-decoration: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>[ CREATE_USER ]</h1>
-        <form action="/register" method="POST">
+        <div id="avatarArea" class="avatar-container">
+            <img id="avatarImg" src="" alt="Google Avatar" class="avatar-img">
+            <p style="font-size: 0.8rem; margin-top: 10px; color: var(--accent);">Google Account Detected</p>
+        </div>
+
+        <h1 id="pageTitle">[ NEW_USER ]</h1>
+        <p class="subtitle">Initialize user protocol to database.</p>
+
+        <form action="/auth/register-final" method="POST" id="regForm">
+            
+            <input type="hidden" name="google_id" id="google_id">
+            <input type="hidden" name="avatar" id="avatar_url">
+
             <div class="form-group">
                 <label>CODENAME (Name)</label>
-                <input type="text" name="name" required placeholder="Valeth">
+                <input type="text" name="name" id="name" required placeholder="Valeth">
             </div>
+            
             <div class="form-group">
                 <label>EMAIL_ADDR</label>
-                <input type="email" name="email" required placeholder="valeth@example.com">
+                <input type="email" name="email" id="email" required placeholder="valeth@example.com">
             </div>
-            <div class="form-group">
+
+            <div class="form-group" id="passGroup">
                 <label>PASSPHRASE</label>
-                <input type="password" name="password" required placeholder="••••••••">
+                <input type="password" name="password" id="password" placeholder="••••••••">
             </div>
-            <button type="submit">INITIALIZE</button>
+
+            <button type="submit" id="btnSubmit">INITIALIZE ACCOUNT</button>
         </form>
+
         <div class="links">
-            Already accessible? <a href="/login">Login here</a>
+            <a href="/login">&larr; Abort / Back to Login</a>
         </div>
     </div>
+
+    <script>
+        // 1. Ambil Data dari URL (Query Params)
+        const params = new URLSearchParams(window.location.search);
+        
+        const googleID = params.get('google_id');
+        const email = params.get('email');
+        const name = params.get('name');
+        const avatar = params.get('avatar');
+
+        // 2. Cek: Apakah ini User dari Google?
+        if (googleID) {
+            // --- MODE GOOGLE ---
+            
+            // Isi form otomatis
+            document.getElementById('google_id').value = googleID;
+            document.getElementById('email').value = email;
+            document.getElementById('name').value = name;
+            document.getElementById('avatar_url').value = avatar;
+
+            // Kunci form biar gak diedit (Read Only)
+            document.getElementById('email').readOnly = true;
+            // document.getElementById('name').readOnly = true; // Nama boleh diedit lah ya
+
+            // Tampilin Avatar
+            if(avatar) {
+                document.getElementById('avatarArea').style.display = 'block';
+                document.getElementById('avatarImg').src = avatar;
+            }
+
+            // Sembunyiin Password (Google Login gak butuh password)
+            document.getElementById('passGroup').style.display = 'none';
+
+            // Ubah teks judul & tombol biar keren
+            document.getElementById('pageTitle').innerText = "[ CONFIRM_IDENTITY ]";
+            document.getElementById('btnSubmit').innerText = "CONFIRM & ENTER SYSTEM";
+        
+        } else {
+            // --- MODE MANUAL (Biasa) ---
+            // Pastikan password wajib diisi
+            document.getElementById('password').required = true;
+        }
+    </script>
 </body>
 </html>

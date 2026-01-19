@@ -24,6 +24,7 @@ type UserRepository interface {
 
 // Kontrak kerja buat Logic User (Business Logic)
 type UserUseCase interface {
-	LoginOrRegister(googleID, email, name, avatar string) (User, error)
+	CheckGoogleLogin(string) (User, error)
+	RegisterUser(user *User) error
 	GetProfile(id int) (User, error)
 }

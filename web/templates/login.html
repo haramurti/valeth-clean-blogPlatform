@@ -41,17 +41,25 @@
 <body>
     <div class="container">
         <h1>[ SYSTEM_LOGIN ]</h1>
-        <form action="/login" method="POST">
-            <div class="form-group">
-                <label>USER_ID (Email)</label>
-                <input type="email" name="email" required placeholder="user@valeth.me">
-            </div>
-            <div class="form-group">
-                <label>PASSPHRASE</label>
-                <input type="password" name="password" required placeholder="••••••••">
-            </div>
-            <button type="submit">AUTHENTICATE</button>
-        </form>
+       <div style="text-align: center;">
+    <p style="margin-bottom: 20px; font-size: 0.9rem; color: #aaa;">
+        Access protocol secured via Google OAuth.
+    </p>
+    
+    <a href="/auth/google" style="
+        display: inline-block;
+        background-color: #fff;
+        color: #1e1e1e;
+        padding: 12px 24px;
+        text-decoration: none;
+        font-weight: bold;
+        font-family: 'Inter', sans-serif;
+        border-radius: 4px;
+        transition: 0.2s;
+    ">
+        [ LOGIN WITH GOOGLE ]
+    </a>
+</div>
         <div class="links">
             New user? <a href="/register">Initialize Protocol</a>
             <br><br>

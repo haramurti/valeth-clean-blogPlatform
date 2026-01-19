@@ -24,6 +24,12 @@ func main() {
 	godotenv.Load()
 	db, _ := config.NewDatabase()
 
+	userRepo := repository.NewPostgresUserRepository(db)
+	userUseCase := usecase.NewUserUseCase(userRepo)
+
+	// 2. PASANG HANDLER AUTH (BARU)
+	http.NewAuthHandler(app, userUseCase)
+
 	// 3. Wiring (Ritual)
 	postRepo := repository.NewPostgresPostRepository(db)
 	postUseCase := usecase.NewPostUseCase(postRepo)
