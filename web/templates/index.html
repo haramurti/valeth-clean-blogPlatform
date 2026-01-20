@@ -11,7 +11,6 @@
 
     <style>
         :root {
-            /* Palette Obsidian Dark Mode */
             --bg-main: #1e1e1e;       
             --bg-secondary: #252526;  
             --text-main: #dcddde;     
@@ -36,7 +35,6 @@
 
         a { text-decoration: none; color: inherit; transition: 0.2s; }
         
-        /* LAYOUT */
         .container {
             max-width: 720px; 
             margin: 0 auto;
@@ -46,64 +44,42 @@
         /* --- HEADER --- */
         .site-header {
             display: flex;
-            justify-content: space-between; /* Kiri (Logo+Teks) dan Kanan (Login) pisah */
-            align-items: center; /* Vertikal centering */
+            justify-content: space-between; 
+            align-items: center; 
             margin-bottom: 60px;
             padding-bottom: 20px;
             border-bottom: 1px dashed var(--border-color);
         }
 
-        /* Wrapper buat gabungin Logo & Teks */
         .header-identity {
             display: flex;
-            align-items: center; /* Biar logo sejajar sama teks */
-            gap: 15px; /* Jarak antara logo dan teks */
+            align-items: center; 
+            gap: 15px; 
         }
 
         .site-logo {
-            height: 55px; /* Ukuran logo, sesuaikan selera */
+            height: 55px; 
             width: auto;
-            /* Efek bayangan ungu dikit biar nyatu sama tema */
             filter: drop-shadow(0 0 8px rgba(168, 130, 255, 0.2));
             transition: transform 0.2s ease;
         }
+        .site-logo:hover { transform: scale(1.1) rotate(-5deg); }
 
-        .site-logo:hover {
-            transform: scale(1.1) rotate(-5deg); /* Goyang dikit pas di hover */
-        }
-
-        .brand {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .brand h1 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin: 0;
-            color: #fff;
-        }
-
-        .brand .tagline {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-style: italic;
-        }
+        .brand { display: flex; flex-direction: column; gap: 2px; }
+        .brand h1 { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; margin: 0; color: #fff; }
+        .brand .tagline { font-size: 0.75rem; color: var(--text-muted); font-style: italic; }
 
         .nav-links {
             display: flex;
             gap: 20px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.85rem;
+            align-items: center;
         }
-
         .nav-links a:hover { color: var(--accent); text-decoration: underline; }
 
         /* --- ACTIONS --- */
         .action-bar { margin-bottom: 40px; }
-        
         .btn-create {
             display: inline-flex;
             align-items: center;
@@ -116,62 +92,17 @@
         .btn-create:hover { color: var(--accent-hover); transform: translateX(5px); }
 
         /* --- POST LIST --- */
-        .post-list {
-            display: flex;
-            flex-direction: column;
-            gap: 40px; 
-        }
-
+        .post-list { display: flex; flex-direction: column; gap: 40px; }
         .post-item { display: block; transition: transform 0.2s; }
         .post-item:hover { transform: translateX(5px); }
-
-        .post-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0 0 8px 0;
-            color: #fff;
-            letter-spacing: -0.5px;
-        }
+        .post-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 8px 0; color: #fff; letter-spacing: -0.5px; }
         .post-title a:hover { color: var(--accent); }
-
-        .post-meta {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .post-preview {
-            color: #b0b3b8;
-            font-size: 1rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .read-more {
-            display: inline-block;
-            margin-top: 12px;
-            font-size: 0.85rem;
-            color: var(--accent);
-            font-weight: 600;
-            border-bottom: 1px solid transparent;
-        }
+        .post-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+        .post-preview { color: #b0b3b8; font-size: 1rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .read-more { display: inline-block; margin-top: 12px; font-size: 0.85rem; color: var(--accent); font-weight: 600; border-bottom: 1px solid transparent; }
         .read-more:hover { border-bottom-color: var(--accent); }
 
-        footer {
-            margin-top: 80px;
-            padding-top: 40px;
-            border-top: 1px solid var(--border-color);
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            font-family: 'JetBrains Mono', monospace;
-        }
+        footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; }
     </style>
 </head>
 <body>
@@ -180,17 +111,20 @@
         <header class="site-header">
             
             <div class="header-identity">
-                <img src="/static/images/Removal-858.png" alt="Kuma Logo" class="site-logo">
-                
                 <div class="brand">
-                    <h1>ʕ •ᴥ•ʔ (っ˘ڡ˘ς) kuma-blog くまーブログ.md</h1>
+                    <h1>ʕ •ᴥ•ʔ kuma-blog くまーブログ.md</h1>
                     <span class="tagline">俺の”ア”女性はかわいすぎて怒ってる猫みたい</span>
                     <span class="tagline" style="font-size: 0.7rem; color: #555;">(Si '' jutek tapi cakep, kek kucing ngamuk)</span>
                 </div>
             </div>
 
             <nav class="nav-links">
-                <a href="/login">[ Login ]</a>
+                {{ if .IsLoggedIn }}
+                    <a href="/profile" style="color: var(--accent); font-size: 1.2rem;" title="My Profile">ʕ♥ᴥ♥ʔ</a>
+                    <a href="/auth/logout" style="font-size: 0.75rem; color: #666;">[ x ]</a>
+                {{ else }}
+                    <a href="/login">[ Login ]</a>
+                {{ end }}
             </nav>
         </header>
 
@@ -201,13 +135,27 @@
         </div>
 
         <div class="post-list">
-            {{ range . }}
+            {{ range .Posts }}
             <article class="post-item">
+                
                 <div class="post-meta">
+                    {{ if .User.ID }}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <img src="{{ .User.Avatar }}" alt="{{ .User.Name }}" 
+                                 style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid #333;">
+                            <a href="/profile?id={{ .User.ID }}" style="color: #fff; font-weight: 600; text-decoration: none;">
+                                {{ .User.Name }}
+                            </a>
+                        </div>
+                        <span style="color: #555;">•</span>
+                    {{ else }}
+                        <span style="font-style: italic;">Ghost Writer</span>
+                        <span style="color: #555;">•</span>
+                    {{ end }}
+
                     <span>{{ .CreatedAt.Format "02 Jan 2006" }}</span>
-                    <span>•</span>
-                    <span>#Uncategorized</span>
                 </div>
+
                 <h2 class="post-title">
                     <a href="/post?id={{ .ID }}">{{ .Title }}</a>
                 </h2>

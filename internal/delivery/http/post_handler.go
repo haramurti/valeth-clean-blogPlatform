@@ -1,7 +1,10 @@
 package http
 
 import (
+	"fmt"
 	"valeth-clean-blogPlatform/internal/domain"
+
+	"valeth-clean-blogPlatform/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -21,16 +24,26 @@ func NewPostHandler(app *fiber.App, u domain.PostUseCase) {
 	// 3. Daftar Menu
 	// api ini variable grouping, jadi yang mau dibawah ini harus lewat grouping dahulu
 	api := app.Group("/api")
+
+	// --- RUTE PUBLIC (Bebas Masuk) ---
 	api.Get("/posts", handler.Fetch)
 	api.Get("/posts/:id", handler.GetByID)
-	api.Post("/posts", handler.Store)
-	api.Delete("/posts/:id", handler.Delete)
-
-	app.Get("/", handler.PageHome) // Open Home
+	app.Get("/", handler.PageHome)
 	app.Get("/post", handler.PagePostDetail)
 	app.Get("/login", handler.PageLogin)
 	app.Get("/register", handler.PageRegister)
-	app.Get("/create", handler.PageCreate)
+
+	// --- RUTE PRIVATE (Dijaga Satpam) ---
+	// Kita bikin grup baru khusus yang diproteksi
+	protected := api.Group("/", middleware.AuthProtected)
+
+	// Semua rute di bawah ini otomatis dicek login dulu
+	protected.Post("/posts", handler.Store)
+	protected.Delete("/posts/:id", handler.Delete)
+
+	// Page Create juga harus dijaga satpam
+	// Kalau belum login, jangan kasih buka halaman nulis
+	app.Get("/create", middleware.AuthProtected, handler.PageCreate)
 
 }
 
@@ -59,12 +72,17 @@ func (h *PostHandler) Store(c *fiber.Ctx) error {
 	// 2. Dapet bahan bahan dari user.
 	// Tamu ngirim JSON: {"title": "Halo", "content": "..."}
 	// Kita tuang ke piring 'post'
+
 	if err := c.BodyParser(&post); err != nil {
 		// if tamunya ngirim sampah (JSON rusak), marahin (Bad Request)
 		return c.Status(400).JSON(fiber.Map{
 			"message": "Data lu ngaco bro: " + err.Error(),
 		})
 	}
+
+	userID := c.Locals("user_id").(int) // Assert ke int
+
+	post.UserID = uint(userID)
 
 	//3. Kasih ke Manajer ngasih tau
 	if err := h.postUseCase.Store(&post); err != nil {
@@ -139,6 +157,17 @@ func (h *PostHandler) PageHome(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Error database bro: " + err.Error())
 	}
 
+	// 2. Cek Status Login (Punya cookie user_id gak?)
+	cookieUserID := c.Cookies("user_id")
+	isLoggedIn := cookieUserID != "" // Bernilai true kalau cookie ada
+
+	// 3. Kirim Paket Lengkap (Map)
+	// Kita gak kirim 'posts' mentah lagi, tapi kita bungkus pake fiber.Map
+	return c.Render("index", fiber.Map{
+		"Posts":      posts,      // Datanya sekarang ada di dalam kunci "Posts"
+		"IsLoggedIn": isLoggedIn, // Status login
+	})
+
 	// Render file 'index.html' dengan data posts
 	return c.Render("index", posts)
 }
@@ -169,5 +198,6 @@ func (h *PostHandler) PageRegister(c *fiber.Ctx) error {
 
 // 5. HALAMAN CREATE
 func (h *PostHandler) PageCreate(c *fiber.Ctx) error {
+	fmt.Println("📄 [HANDLER] Halaman Create dipanggil!")
 	return c.Render("create", nil) // Asumsi lu nanti bikin create.html
 }
