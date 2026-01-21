@@ -33,3 +33,8 @@ func (r *postgresUserRepository) GetByID(id int) (domain.User, error) {
 	err := r.Conn.First(&user, id).Error
 	return user, err
 }
+
+// Tambahin fungsi ini buat update data user
+func (r *postgresUserRepository) Update(user *domain.User) error {
+	return r.Conn.Save(user).Error
+}

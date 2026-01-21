@@ -70,24 +70,24 @@ func (h *AuthHandler) GoogleCallback(c *fiber.Ctx) error {
 
 	userData, _ := io.ReadAll(resp.Body)
 
+	// Struct buat nangkep data Google
 	var googleUser struct {
 		ID      string `json:"id"`
 		Email   string `json:"email"`
 		Name    string `json:"name"`
-		Picture string `json:"picture"`
+		Picture string `json:"picture"` // <--- Ini URL Foto Terbaru
 	}
 
 	if err := json.Unmarshal(userData, &googleUser); err != nil {
 		return c.Status(500).SendString("Gagal baca JSON Google")
 	}
 
-	// D. CEK DI DATABASE (Panggil Usecase)
+	// D. CEK DI DATABASE
 	user, err := h.userUseCase.CheckGoogleLogin(googleUser.ID)
 
 	if err != nil {
 		// KASUS: USER BELUM ADA -> REDIRECT KE REGISTER
 		if err.Error() == "USER_NOT_FOUND" {
-			// Titip data Google di URL
 			targetURL := fmt.Sprintf("/register?email=%s&name=%s&avatar=%s&google_id=%s",
 				url.QueryEscape(googleUser.Email),
 				url.QueryEscape(googleUser.Name),
@@ -96,17 +96,34 @@ func (h *AuthHandler) GoogleCallback(c *fiber.Ctx) error {
 			)
 			return c.Redirect(targetURL)
 		}
-
-		// KASUS: ERROR LAIN
 		return c.Status(500).SendString("Error database: " + err.Error())
 	}
 
-	// E. KASUS: USER ADA -> LANGSUNG LOGIN
+	// --- [PERBAIKAN DISINI] ---
+	// E. SYNC AVATAR: Update foto database kalau beda sama Google
+	if user.Avatar != googleUser.Picture {
+		// Update data di memory
+		user.Avatar = googleUser.Picture
+
+		// Panggil fungsi Update di Usecase (Pastikan fungsi ini ada!)
+		// Kalau error update, kita ignore aja (log doang), yang penting user tetep bisa login
+		_ = h.userUseCase.UpdateUser(&user)
+	}
+	// --------------------------
+
+	// F. KASUS: USER ADA -> LANGSUNG LOGIN
 	c.Cookie(&fiber.Cookie{
 		Name:     "user_id",
 		Value:    fmt.Sprintf("%d", user.ID),
 		Expires:  time.Now().Add(24 * time.Hour),
 		HTTPOnly: true,
+	})
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "avatar",
+		Value:    user.Avatar, // Simpan link foto Google
+		Expires:  time.Now().Add(24 * time.Hour),
+		HTTPOnly: true, // Biar aman
 	})
 
 	return c.Redirect("/")
@@ -146,6 +163,13 @@ func (h *AuthHandler) RegisterFinal(c *fiber.Ctx) error {
 		Value:    fmt.Sprintf("%d", newUser.ID), // ID baru dari DB
 		Expires:  time.Now().Add(24 * time.Hour),
 		HTTPOnly: true,
+	})
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "avatar",
+		Value:    newUser.Avatar, // Simpan link foto Google
+		Expires:  time.Now().Add(24 * time.Hour),
+		HTTPOnly: true, // Biar aman
 	})
 
 	// F. Masuk ke Home

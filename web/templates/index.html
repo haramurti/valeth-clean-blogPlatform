@@ -11,14 +11,12 @@
 
     <style>
         :root {
-            /* --- QUORA DARK THEME PALETTE --- */
             --bg-main: #181818;       
             --bg-secondary: #262626;  
             --text-main: #d5d5d5;     
             --text-muted: #939598;    
             --accent: #a882ff;        
             --accent-hover: #bfa3ff;  
-            --border-color: #333333;  
         }
 
         * { box-sizing: border-box; }
@@ -34,11 +32,11 @@
 
         a { text-decoration: none; color: inherit; transition: 0.2s; }
         
-        /* --- HEADER (TIPIS 70%) --- */
+        /* --- HEADER (LEBAR FULL SCREEN) --- */
         .site-header {
             width: 100%;
             background-color: var(--bg-secondary); 
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid #2f2f2f; 
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -46,113 +44,135 @@
         }
 
         .header-inner {
-            max-width: 720px; 
-            margin: 0 auto; 
-            padding: 10px 24px; 
+            /* SEKARANG FULL WIDTH (Gak ditahan di 720px lagi) */
+            width: 100%;
+            max-width: 100%; 
+            padding: 15px 40px; /* Padding pinggir agak gede biar enak diliat */
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
+        /* CONTAINER ISI (TETAP KECIL DI TENGAH BIAR ENAK BACA) */
         .container {
             max-width: 720px; 
             margin: 0 auto;
             padding: 40px 24px; 
         }
 
-        .header-identity { display: flex; align-items: center; gap: 15px; }
+        /* LOGO KUMA (KIRI) */
+        .header-identity { display: flex; align-items: center; gap: 15px;margin-left: 400px; }
         .brand { display: flex; flex-direction: column; gap: 0px; }
         .brand h1 { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700; margin: 0; color: #fff; }
         .brand .tagline { font-size: 0.7rem; color: var(--text-muted); font-style: italic; }
+        
 
+        /* NAVIGASI KANAN (PROFILE) */
         .nav-links {
-            display: flex; gap: 20px;
-            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+            display: flex; 
             align-items: center;
+            gap: 20px;
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 0.8rem;
         }
         .nav-links a:hover { color: var(--accent); text-decoration: underline; }
 
+        /* FOTO PROFILE DI KANAN */
+        .nav-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            
+        }
+        
+        .header-avatar-img {
+            width: 32px; 
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            
+            /* BORDER UNGU DIHAPUS */
+            border: none;
+            outline: none; 
+            
+            transition: transform 0.2s;
+            
+        }
+        .header-avatar-img:hover { transform: scale(1.1); cursor: pointer; }
+
+        /* --- ACTION BAR & POST LIST --- */
         .action-bar { margin-bottom: 30px; }
+        
         .btn-create {
             display: inline-flex; align-items: center; gap: 8px;
             font-family: 'JetBrains Mono', monospace; color: var(--accent);
             font-size: 0.9rem; padding: 10px 16px;
             background: var(--bg-secondary);
-            border-radius: 4px; border: 1px solid var(--border-color);
+            border-radius: 4px; border: none; 
         }
-        .btn-create:hover { border-color: var(--accent); background: #333; }
+        .btn-create:hover { background: #333; }
 
-        /* --- POST LIST (FULL CLICKABLE CARD) --- */
         .post-list { display: flex; flex-direction: column; gap: 30px; }
 
         .post-item { 
             display: block; 
             background-color: var(--bg-secondary); 
-            border: 1px solid var(--border-color);
+            border: none; /* CLEAN LOOK */
             border-radius: 4px; 
             overflow: hidden; 
-            transition: border-color 0.2s ease, transform 0.2s ease;
-            
-            /* UI UX: Cursor jadi telunjuk biar user tau bisa diklik */
+            transition: transform 0.2s ease;
             cursor: pointer; 
         }
 
-        /* Hover Effect: Border ungu & angkat dikit */
         .post-item:hover { 
-            border-color: var(--accent); 
             transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .post-header-area {
             background-color: transparent; 
             padding: 12px 20px;
-            border-bottom: 1px solid var(--border-color);
             display: flex; align-items: center; gap: 12px;
         }
 
         .post-content-area {
             background-color: transparent; 
-            padding: 24px 20px;
+            padding: 10px 20px 24px 20px; 
         }
 
         .post-footer-area {
             background-color: transparent; 
             padding: 10px 20px;
-            border-top: 1px solid var(--border-color);
             display: flex; justify-content: flex-end; 
         }
 
         .author-avatar {
             width: 32px; height: 32px;
             border-radius: 50%; background-color: #333; 
-            object-fit: cover; border: 1px solid #444; 
+            object-fit: cover; border: none; 
         }
 
         .post-meta-text { display: flex; flex-direction: column; line-height: 1.2; }
         
-        /* Link Penulis harus tetep bisa diklik terpisah */
         .author-name { 
             font-size: 0.85rem; font-weight: 700; color: #fff; 
-            position: relative; z-index: 2; /* Biar di atas link kartu */
+            position: relative; z-index: 2; 
         }
         .author-name:hover { color: var(--accent); text-decoration: underline; }
 
         .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-muted); }
         .post-title { font-size: 1.4rem; font-weight: 700; margin: 0 0 10px 0; color: #fff; letter-spacing: -0.5px; }
         .post-preview { color: #b0b3b8; font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin: 0; }
-        
-        .read-more { 
-            display: inline-block; font-size: 0.8rem; color: var(--accent); 
-            font-weight: 600; font-family: 'JetBrains Mono', monospace; 
-        }
+        .read-more { display: inline-block; font-size: 0.8rem; color: var(--accent); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
 
-        footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; }
+        footer { margin-top: 80px; padding-top: 40px; border-top: 1px solid #2f2f2f; text-align: center; color: var(--text-muted); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; }
     </style>
 </head>
 <body>
 
-    <header class="site-header">
+   <header class="site-header">
         <div class="header-inner">
+            
             <div class="header-identity">
                 <div class="brand">
                     <h1>ʕ •ᴥ•ʔ kuma-blog くまーブログ.md</h1>
@@ -162,8 +182,16 @@
 
             <nav class="nav-links">
                 {{ if .IsLoggedIn }}
-                    <a href="/profile" style="color: var(--accent); font-size: 1.2rem;" title="My Profile">ʕ♥ᴥ♥ʔ</a>
-                    <a href="/auth/logout" style="font-size: 0.75rem; color: #666;">[ x ]</a>
+                    <div class="nav-profile">
+                        <a href="/profile" title="My Profile">
+                            {{ if .UserAvatar }}
+                                <img src="{{ .UserAvatar }}" alt="Profile" class="header-avatar-img">
+                            {{ else }}
+                                <div class="header-avatar-img" style="background:#444; display:flex; align-items:center; justify-content:center; color:#fff;">?</div>
+                            {{ end }}
+                        </a>
+                        <a href="/auth/logout" style="font-size: 0.75rem; color: #666; margin-left: 5px;">[ x ]</a>
+                    </div>
                 {{ else }}
                     <a href="/login">[ Login ]</a>
                 {{ end }}

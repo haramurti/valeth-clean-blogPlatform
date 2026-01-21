@@ -20,6 +20,7 @@ type UserRepository interface {
 	FindByGoogleID(googleID string) (User, error)
 	Create(user *User) error
 	GetByID(id int) (User, error)
+	Update(user *User) error
 }
 
 // Kontrak kerja buat Logic User (Business Logic)
@@ -27,4 +28,5 @@ type UserUseCase interface {
 	CheckGoogleLogin(string) (User, error)
 	RegisterUser(user *User) error
 	GetProfile(id int) (User, error)
+	UpdateUser(user *User) error
 }

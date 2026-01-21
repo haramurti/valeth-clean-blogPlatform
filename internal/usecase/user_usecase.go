@@ -55,3 +55,8 @@ func (u *userUseCase) RegisterUser(newUser *domain.User) error {
 	// Suruh Repo simpan
 	return u.userRepo.Create(newUser)
 }
+
+// Tambahin ini buat nyambungin Handler ke Repo
+func (u *userUseCase) UpdateUser(user *domain.User) error {
+	return u.userRepo.Update(user)
+}

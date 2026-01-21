@@ -62,3 +62,7 @@ func (u *postUseCase) Delete(id int) error {
 
 	return u.postRepo.Delete(id)
 }
+
+func (u *postUseCase) FetchByUserID(userID int) ([]domain.Post, error) {
+	return u.postRepo.FetchByUserID(userID)
+}

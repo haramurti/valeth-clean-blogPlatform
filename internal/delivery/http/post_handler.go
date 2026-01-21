@@ -44,6 +44,7 @@ func NewPostHandler(app *fiber.App, u domain.PostUseCase) {
 	// Page Create juga harus dijaga satpam
 	// Kalau belum login, jangan kasih buka halaman nulis
 	app.Get("/create", middleware.AuthProtected, handler.PageCreate)
+	app.Get("/profile", middleware.AuthProtected, handler.PageProfile)
 
 }
 
@@ -150,26 +151,33 @@ func (h *PostHandler) Delete(c *fiber.Ctx) error {
 // ==========================================
 
 // 1. HALAMAN DEPAN (HOME)
+// Buka file: internal/delivery/http/post_handler.go
+
 func (h *PostHandler) PageHome(c *fiber.Ctx) error {
-	// Panggil Manajer (Usecase) buat ambil data
+	// 1. Ambil Data Postingan
 	posts, err := h.postUseCase.Fetch("")
 	if err != nil {
 		return c.Status(500).SendString("Error database bro: " + err.Error())
 	}
 
-	// 2. Cek Status Login (Punya cookie user_id gak?)
+	// 2. Cek Cookie Login & Avatar
 	cookieUserID := c.Cookies("user_id")
-	isLoggedIn := cookieUserID != "" // Bernilai true kalau cookie ada
 
-	// 3. Kirim Paket Lengkap (Map)
-	// Kita gak kirim 'posts' mentah lagi, tapi kita bungkus pake fiber.Map
+	// --- [BARIS BARU] AMBIL FOTO DARI SAKU ---
+	cookieAvatar := c.Cookies("avatar")
+	// -----------------------------------------
+
+	isLoggedIn := cookieUserID != ""
+
+	// 3. Kirim Data Lengkap ke HTML
 	return c.Render("index", fiber.Map{
-		"Posts":      posts,      // Datanya sekarang ada di dalam kunci "Posts"
-		"IsLoggedIn": isLoggedIn, // Status login
-	})
+		"Posts":      posts,
+		"IsLoggedIn": isLoggedIn,
 
-	// Render file 'index.html' dengan data posts
-	return c.Render("index", posts)
+		// --- [BARIS BARU] KIRIM KE FRONTEND ---
+		"UserAvatar": cookieAvatar,
+		// --------------------------------------
+	})
 }
 
 // 2. HALAMAN BACA POSTINGAN (DETAIL)
@@ -200,4 +208,64 @@ func (h *PostHandler) PageRegister(c *fiber.Ctx) error {
 func (h *PostHandler) PageCreate(c *fiber.Ctx) error {
 	fmt.Println("📄 [HANDLER] Halaman Create dipanggil!")
 	return c.Render("create", nil) // Asumsi lu nanti bikin create.html
+}
+
+// ... import dan kode lain ...
+
+func (h *PostHandler) PageProfile(c *fiber.Ctx) error {
+	// 1. Cek ID siapa yang mau dilihat?
+	// Kalau ada ?id=5 di URL, pakai itu.
+	targetID := c.QueryInt("id")
+
+	// 2. Ambil ID kita sendiri dari Cookie (buat cek login & fallback)
+	myCookieID := c.Cookies("user_id")
+	var myID int
+	fmt.Sscanf(myCookieID, "%d", &myID)
+
+	// Kalau URL gak ada ?id=..., berarti user mau liat profil sendiri
+	if targetID == 0 {
+		if myID != 0 {
+			targetID = myID
+		} else {
+			// Kalau gak ada ID target DAN belum login -> Tendang ke Login
+			return c.Redirect("/login")
+		}
+	}
+
+	// 3. Ambil Data Postingan milik Target ID
+	posts, err := h.postUseCase.FetchByUserID(targetID)
+	if err != nil {
+		return c.Status(500).SendString("Gagal ambil post: " + err.Error())
+	}
+
+	// 4. Ambil Data User Target (Dari postingan pertama aja biar hemat query)
+	// Trik: Kalau dia punya postingan, data user ada di posts[0].User
+	// Kalau dia GAK punya postingan, kita harus query manual (PR nanti),
+	// tapi sementara kita handle kalau posts ada isinya aja.
+
+	var profileUser domain.User
+	if len(posts) > 0 {
+		profileUser = posts[0].User
+	} else {
+		// TODO: Kalau user belum pernah posting, idealnya kita fetch user by ID lewat UserUseCase.
+		// Tapi biar cepet, kita kosongin dulu atau redirect home.
+		// return c.Redirect("/")
+		// Biar ga error, kita bikin dummy user (atau fetch manual via repo user kalau lu udah siapin)
+		profileUser.Name = "New Member"
+		profileUser.Avatar = "https://api.dicebear.com/9.x/micah/svg?seed=new"
+	}
+
+	// 5. Cek apakah ini profil kita sendiri? (Buat nampilin tombol Edit nanti)
+	isOwnProfile := (targetID == myID)
+
+	// 6. Data buat Header (Cookie)
+	cookieAvatar := c.Cookies("avatar")
+
+	return c.Render("profile", fiber.Map{
+		"Posts":        posts,
+		"ProfileUser":  profileUser, // Data pemilik profil
+		"IsOwnProfile": isOwnProfile,
+		"IsLoggedIn":   myID != 0,
+		"UserAvatar":   cookieAvatar, // Data foto kita di pojok kanan atas
+	})
 }

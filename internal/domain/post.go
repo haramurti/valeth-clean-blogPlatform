@@ -22,6 +22,7 @@ type PostRepository interface {
 	Store(p *Post) error
 	Update(p *Post) error
 	Delete(id int) error
+	FetchByUserID(userID int) ([]Post, error)
 }
 
 type PostUseCase interface {
@@ -30,4 +31,5 @@ type PostUseCase interface {
 	Store(p *Post) error
 	Update(id int, p *Post) error
 	Delete(id int) error
+	FetchByUserID(userID int) ([]Post, error)
 }
