@@ -8,46 +8,116 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #1e1e1e;
-            --text-main: #dcddde;
+            /* Warna Body disamakan dengan Index (Quora Dark) */
+            --bg-main: #181818; 
+            --text-main: #d5d5d5;
             --text-muted: #787c88;
             --accent: #a882ff;
-            --border-color: #363636;
+            --accent-hover: #bfa3ff;
+            --border-color: #333333;
         }
         
+        * { box-sizing: border-box; }
+
         body { 
             background: var(--bg-main); 
             color: var(--text-main); 
             font-family: 'Inter', sans-serif; 
             margin: 0; 
             padding: 0; 
-        }
-
-        .container { 
-            max-width: 720px; 
-            margin: 0 auto; 
-            padding: 40px 24px; 
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* HEADER NAV */
-        .top-nav {
+        .container { 
+            max-width: 720px; 
+            margin: 0 auto; 
+            padding: 60px 24px 100px 24px; /* Padding bawah gede biar ga ketutupan tombol */
+            flex-grow: 1;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        /* FORM AREA - CLEAN OBSIDIAN STYLE */
+        #createForm {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            flex-grow: 1;
+        }
+
+        /* INPUT JUDUL */
+        .input-title {
+            background: transparent;
+            border: none;
+            /* Gak ada border kotak, cuma garis bawah tipis pas diklik (opsional) */
+            border-bottom: 1px solid transparent; 
+            color: #fff;
+            font-size: 2.5rem; /* Judul Gede */
+            font-weight: 800;
+            width: 100%;
+            outline: none;
+            padding: 10px 0;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s;
         }
         
-        .back-link { 
+        .input-title:focus { 
+            /* Pas diklik baru muncul garis tipis banget biar tau lagi ngetik dimana */
+            border-bottom-color: #333; 
+        }
+        
+        .input-title::placeholder { color: #444; }
+
+        /* TEXTAREA CONTENT */
+        .input-content {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            /* Font Monospace biar vibes-nya 'Old School' Markdown editor */
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 1.1rem;
+            line-height: 1.6;
+            width: 100%;
+            flex-grow: 1; /* Ngisi sisa layar ke bawah */
+            resize: none; 
+            outline: none;
+            min-height: 400px;
+        }
+        
+        .input-content::placeholder { color: #333; font-style: italic; }
+
+        /* FOOTER ACTIONS (Pojok Kanan Bawah) */
+        .action-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 40px;
+            /* Gradient background dikit biar tombolnya kebaca kalo tulisan panjang */
+            background: linear-gradient(to top, var(--bg-main) 80%, transparent);
+            display: flex;
+            justify-content: flex-end; /* Mentok Kanan */
+            align-items: center;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .btn-cancel { 
             font-family: 'JetBrains Mono', monospace; 
             font-size: 0.9rem; 
             color: var(--text-muted); 
             text-decoration: none; 
             transition: 0.2s;
+            font-weight: 600;
+            background: none;
+            border: none;
+            cursor: pointer;
         }
-        .back-link:hover { color: var(--accent); }
+        .btn-cancel:hover { color: #fff; }
 
         .btn-save {
             background: var(--accent);
@@ -55,102 +125,54 @@
             font-family: 'JetBrains Mono', monospace;
             font-weight: 700;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             cursor: pointer;
             font-size: 0.9rem;
+            border-radius: 4px; /* Radius kecil minimalis */
             transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        .btn-save:hover { background: #bfa3ff; transform: translateY(-2px); }
-
-        /* FORM AREA */
-        #createForm {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* INPUT JUDUL (GAYA CLEAN) */
-        .input-title {
-            background: transparent;
-            border: none;
-            border-bottom: 1px dashed transparent;
-            color: #fff;
-            font-size: 2.5rem;
-            font-weight: 800;
-            width: 100%;
-            outline: none;
-            padding: 10px 0;
-            font-family: 'Inter', sans-serif;
-            transition: border 0.3s;
-        }
-        .input-title:focus { border-bottom-color: var(--border-color); }
-        .input-title::placeholder { color: #333; }
-
-        /* TEXTAREA CONTENT (GAYA EDITOR) */
-        .input-content {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            font-family: 'JetBrains Mono', monospace; /* Biar kerasa ngoding */
-            font-size: 1.1rem;
-            line-height: 1.6;
-            width: 100%;
-            flex-grow: 1; /* Ngisi sisa layar */
-            resize: none; /* Gak usah resize, udah fullscreen */
-            outline: none;
-            min-height: 400px;
-        }
-        .input-content::placeholder { color: #333; font-style: italic; }
+        .btn-save:hover { background: var(--accent-hover); transform: translateY(-2px); }
+        .btn-save:disabled { background: #444; cursor: not-allowed; }
 
     </style>
 </head>
 <body>
-    <div class="container">
-        
-        <form id="createForm">
-            
-            <div class="top-nav">
-                <a href="/" class="back-link">&larr; Cancel / Abort</a>
-                <button type="submit" class="btn-save">[ SAVE_LOG ]</button>
-            </div>
 
-            <input type="text" id="title" class="input-title" placeholder="Untitled Log..." required autocomplete="off">
+    <div class="container">
+        <form id="createForm">
+            <input type="text" id="title" class="input-title" placeholder="Untitled Log..." required autocomplete="off" autofocus>
 
             <textarea id="content" class="input-content" placeholder="Start typing system log here..." required></textarea>
-        </form>
 
+            <div class="action-footer">
+                <a href="/" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-save">PUBLISH ENTRY</button>
+            </div>
+        </form>
     </div>
 
     <script>
+        // Script Logic Posting (Masih sama, cuma beda UI)
         document.getElementById('createForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); // Jangan refresh halaman
+            e.preventDefault(); 
 
-            // 1. Ambil data dari input
             const title = document.getElementById('title').value;
             const content = document.getElementById('content').value;
             const btn = document.querySelector('.btn-save');
-
-            // 2. Ubah tombol jadi Loading
             const originalText = btn.innerText;
-            btn.innerText = "SAVING...";
+
+            btn.innerText = "WRITING...";
             btn.disabled = true;
 
             try {
-                // 3. Tembak ke API Backend (Method POST)
                 const response = await fetch('/api/posts', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        title: title,
-                        content: content
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: title, content: content })
                 });
 
                 if (response.ok) {
-                    // 4. Kalau sukses, balik ke Home
                     window.location.href = "/";
                 } else {
                     const err = await response.json();
@@ -160,11 +182,23 @@
                 }
             } catch (error) {
                 console.error(error);
-                alert("Gagal konek ke server.");
+                alert("Server Error");
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
         });
+
+        // Auto Resize Textarea biar kayak editor beneran
+        const tx = document.getElementsByTagName("textarea");
+        for (let i = 0; i < tx.length; i++) {
+            tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
+            tx[i].addEventListener("input", OnInput, false);
+        }
+
+        function OnInput() {
+            this.style.height = "auto";
+            this.style.height = (this.scrollHeight) + "px";
+        }
     </script>
 </body>
 </html>
