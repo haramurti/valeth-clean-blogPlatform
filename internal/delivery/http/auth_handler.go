@@ -184,3 +184,69 @@ func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 	})
 	return c.Redirect("/")
 }
+
+// ... import ...
+
+//register Manual baru kamis 22
+
+// --- [BARU] PROSES REGISTER MANUAL ---
+func (h *AuthHandler) ProcessRegisterManual(c *fiber.Ctx) error {
+	var form struct {
+		Name     string `form:"name"`
+		Email    string `form:"email"`
+		Password string `form:"password"`
+	}
+
+	if err := c.BodyParser(&form); err != nil {
+		return c.Status(400).SendString("Input error")
+	}
+
+	newUser := domain.User{
+		Name:     form.Name,
+		Email:    form.Email,
+		Password: form.Password,
+	}
+
+	if err := h.userUseCase.RegisterManual(&newUser); err != nil {
+		return c.Status(500).SendString("Gagal Register: " + err.Error())
+	}
+
+	// Sukses -> Lempar ke Login
+	return c.Redirect("/login")
+}
+
+// --- [BARU] PROSES LOGIN MANUAL ---
+func (h *AuthHandler) ProcessLoginManual(c *fiber.Ctx) error {
+	var form struct {
+		Email    string `form:"email"`
+		Password string `form:"password"`
+	}
+
+	if err := c.BodyParser(&form); err != nil {
+		return c.Status(400).SendString("Input error")
+	}
+
+	// Panggil Usecase
+	user, err := h.userUseCase.LoginManual(form.Email, form.Password)
+	if err != nil {
+		return c.Status(401).SendString("Login Gagal: " + err.Error())
+	}
+
+	// Set Cookie ID
+	c.Cookie(&fiber.Cookie{
+		Name:     "user_id",
+		Value:    fmt.Sprintf("%d", user.ID),
+		Expires:  time.Now().Add(24 * time.Hour),
+		HTTPOnly: true,
+	})
+
+	// Set Cookie Avatar (PENTING BIAR FOTO MUNCUL)
+	c.Cookie(&fiber.Cookie{
+		Name:     "avatar",
+		Value:    user.Avatar,
+		Expires:  time.Now().Add(24 * time.Hour),
+		HTTPOnly: true,
+	})
+
+	return c.Redirect("/")
+}

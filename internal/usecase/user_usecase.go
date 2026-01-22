@@ -4,6 +4,8 @@ import (
 	"errors"
 	"valeth-clean-blogPlatform/internal/domain"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"gorm.io/gorm"
 )
 
@@ -44,6 +46,7 @@ func (u *userUseCase) GetProfile(id int) (domain.User, error) {
 
 // ... fungsi CheckGoogleLogin yang lama ...
 
+// kamis 22 baru
 // --- TAMBAHAN BARU ---
 // Fungsi buat Simpan User Baru (Finalisasi Register)
 func (u *userUseCase) RegisterUser(newUser *domain.User) error {
@@ -59,4 +62,48 @@ func (u *userUseCase) RegisterUser(newUser *domain.User) error {
 // Tambahin ini buat nyambungin Handler ke Repo
 func (u *userUseCase) UpdateUser(user *domain.User) error {
 	return u.userRepo.Update(user)
+}
+
+// ... kode yang lama ...
+
+// 1. REGISTER MANUAL (HASHING)
+func (u *userUseCase) RegisterManual(user *domain.User) error {
+	// Cek dulu email udah ada belum?
+	existingUser, _ := u.userRepo.GetByEmail(user.Email)
+	if existingUser != nil {
+		return errors.New("email sudah terdaftar bro")
+	}
+
+	// Acak Password (Hashing)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	// Simpan versi hash-nya, BUKAN plain text
+	user.Password = string(hashedPassword)
+
+	// Set Avatar default kalau kosong
+	if user.Avatar == "" {
+		user.Avatar = "https://api.dicebear.com/9.x/micah/svg?seed=" + user.Name
+	}
+
+	return u.userRepo.Store(user)
+}
+
+// 2. LOGIN MANUAL (COMPARING)
+func (u *userUseCase) LoginManual(email, password string) (*domain.User, error) {
+	// Cari User by Email
+	user, err := u.userRepo.GetByEmail(email)
+	if err != nil {
+		return nil, errors.New("email tidak ditemukan")
+	}
+
+	// Bandingkan Password Input vs Password Hash di DB
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return nil, errors.New("password salah bro")
+	}
+
+	return user, nil
 }

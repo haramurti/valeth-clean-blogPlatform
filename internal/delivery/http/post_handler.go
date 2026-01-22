@@ -118,29 +118,53 @@ func (h *PostHandler) GetByID(c *fiber.Ctx) error {
 }
 
 func (h *PostHandler) Delete(c *fiber.Ctx) error {
-	// 1. AMBIL NOMOR MEJA (ID dari URL)
-	// Contoh: DELETE /api/posts/5
-	id, err := c.ParamsInt("id")
+	// 1. AMBIL ID POST DARI URL (Target yang mau dihapus)
+	postID, err := c.ParamsInt("id")
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"message": "ID-nya mana woy, harus angka ya!",
 		})
 	}
 
-	// 2. TERIAK KE MANAJER (Usecase)
-	// "Bos, hapus data nomor 5!"
-	err = h.postUseCase.Delete(id)
+	// 2. AMBIL ID USER DARI SATPAM/MIDDLEWARE (Siapa yang request?)
+	// (Pastikan middleware AuthProtected sudah jalan)
+	requesterID := c.Locals("user_id")
+	if requesterID == nil {
+		return c.Status(401).JSON(fiber.Map{"message": "Login dulu bro!"})
+	}
+	// Konversi ke int (sesuai tipe data user ID lu)
+	currentUserID := requesterID.(int)
+
+	// 3. CEK KEPEMILIKAN (Database Check)
+	// Kita panggil GetByID dulu buat liat siapa pemilik aslinya
+	post, err := h.postUseCase.GetByID(postID)
 	if err != nil {
-		// Bisa jadi error karena ID gak ketemu, atau DB error
+		return c.Status(404).JSON(fiber.Map{
+			"message": "Postingan gak ketemu, mungkin udah dihapus duluan.",
+		})
+	}
+
+	// --- 🛡️ BENTENG PERTAHANAN 🛡️ ---
+	// Bandingkan: "ID Pemilik Postingan" vs "ID Orang yang Request"
+	if post.UserID != uint(currentUserID) {
+		// Kalau beda, TENDANG!
+		return c.Status(403).JSON(fiber.Map{
+			"message": "HEH! JANGAN MALING! Ini bukan tulisan lu, gaboleh dihapus!",
+		})
+	}
+	// -------------------------------
+
+	// 4. EKSEKUSI HAPUS (Kalau lolos pengecekan di atas)
+	err = h.postUseCase.Delete(postID)
+	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"message": "Gagal hapus bro: " + err.Error(),
 		})
 	}
 
-	// 3. LAPORAN SUKSES
-	// Biasanya kalau delete sukses, kita kasih pesan simple aja.
+	// 5. LAPORAN SUKSES
 	return c.Status(200).JSON(fiber.Map{
-		"message": "Mantap, postingan udah lenyap dari muka bumi.",
+		"message": "Aman, postingan milikmu sudah dihapus.",
 	})
 }
 
@@ -155,7 +179,9 @@ func (h *PostHandler) Delete(c *fiber.Ctx) error {
 
 func (h *PostHandler) PageHome(c *fiber.Ctx) error {
 	// 1. Ambil Data Postingan
-	posts, err := h.postUseCase.Fetch("")
+
+	searchKeyword := c.Query("search")
+	posts, err := h.postUseCase.Fetch(searchKeyword)
 	if err != nil {
 		return c.Status(500).SendString("Error database bro: " + err.Error())
 	}
@@ -181,17 +207,34 @@ func (h *PostHandler) PageHome(c *fiber.Ctx) error {
 }
 
 // 2. HALAMAN BACA POSTINGAN (DETAIL)
-func (h *PostHandler) PagePostDetail(c *fiber.Ctx) error {
-	// Ambil ?id=1 dari URL
-	id := c.QueryInt("id")
+// internal/delivery/http/post_handler.go
 
+func (h *PostHandler) PagePostDetail(c *fiber.Ctx) error {
+	// 1. Ambil Data Postingan
+	id := c.QueryInt("id")
 	post, err := h.postUseCase.GetByID(id)
 	if err != nil {
-		return c.Status(404).Render("404", nil) // Kalo mau niat bikin file 404.html
+		return c.Status(404).Render("404", nil)
 	}
 
-	// Render file 'post.html'
-	return c.Render("post", post)
+	// 2. Cek Siapa yang Login (Dari Cookie)
+	cookieUserID := c.Cookies("user_id")
+	var myID int
+	fmt.Sscanf(cookieUserID, "%d", &myID)
+
+	// 3. Cek Kepemilikan (Apakah UserID postingan == UserID login?)
+	isOwnPost := (post.UserID == uint(myID))
+
+	// 4. Ambil Avatar buat Header
+	cookieAvatar := c.Cookies("avatar")
+
+	// 5. Kirim ke HTML (Pake fiber.Map biar bisa kirim banyak data)
+	return c.Render("post", fiber.Map{
+		"Post":       post,         // Isinya: Title, Content, User, dll
+		"IsOwnPost":  isOwnPost,    // Isinya: true/false
+		"IsLoggedIn": myID != 0,    // Buat Header
+		"UserAvatar": cookieAvatar, // Buat Header
+	})
 }
 
 // 3. HALAMAN LOGIN (Cuma nampilin doang)

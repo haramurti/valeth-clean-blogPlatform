@@ -18,18 +18,25 @@ func NewPostgresPostRepository(Conn *gorm.DB) domain.PostRepository {
 func (m *postgresPostRepository) Fetch(search string) ([]domain.Post, error) {
 	var posts []domain.Post
 
-	query := m.Conn.Preload("User")
+	// 1. Joins("User"): Gabungin tabel Users biar bisa difilter
+	// 2. Preload("User"): Masukin data User ke struct Post (biar bisa ditampilin di JSON/HTML)
+	// 3. Debug(): Biar keliatan query SQL-nya di terminal (Hapus nanti kalo udah production)
+	query := m.Conn.Debug().Preload("User").Joins("User")
 
 	if search != "" {
 		term := "%" + strings.ToLower(search) + "%"
-		// Logic search diperluas: Cari Judul ATAU Konten ATAU Nama Penulis
-		query = query.Joins("User").Where(
-			"LOWER(posts.title) LIKE ? OR LOWER(posts.content) LIKE ? OR LOWER(User.name) LIKE ?",
+
+		// --- PERBAIKAN DISINI ---
+		// Ganti "User".name jadi users.name (sesuai nama tabel asli di Postgres)
+		query = query.Where(
+			"LOWER(posts.title) LIKE ? OR LOWER(posts.content) LIKE ? OR LOWER(\"User\".name) LIKE ?",
 			term, term, term,
 		)
 	}
 
-	err := query.Order("created_at desc").Find(&posts).Error
+	// Urutkan dari terbaru
+	err := query.Order("posts.created_at desc").Find(&posts).Error
+
 	if err != nil {
 		return nil, err
 	}

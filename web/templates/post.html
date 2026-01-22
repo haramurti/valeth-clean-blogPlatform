@@ -3,72 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .Title }} - Valeth.md</title>
+    <title>{{ .Post.Title }}</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-main: #1e1e1e; --text-main: #dcddde; --text-muted: #787c88;
-            --accent: #a882ff; --border-color: #363636;
+            --bg-main: #181818;       
+            --bg-secondary: #262626;  
+            --text-main: #d5d5d5;     
+            --text-muted: #939598;    
+            --accent: #a882ff;        
+            --danger: #ff5f5f;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            line-height: 1.8; /* Line height gede biar enak baca */
         }
         
-        body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 0; line-height: 1.8; }
-        .container { max-width: 720px; margin: 0 auto; padding: 60px 24px; }
-        a { color: inherit; text-decoration: none; transition: 0.2s; }
+        a { text-decoration: none; color: inherit; transition: 0.2s; }
+        
+        /* HEADER NAV (Konsisten) */
+        .site-header {
+            border-bottom: 1px solid #2f2f2f;
+            padding: 10px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .brand { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #fff; font-size: 0.9rem;}
+        .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: none; }
 
-        /* HEADER NAV */
-        .back-link { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--text-muted); display: inline-block; margin-bottom: 40px; }
-        .back-link:hover { color: var(--accent); transform: translateX(-5px); }
+        /* CONTAINER BACA (Lebih sempit dikit biar fokus) */
+        .container { max-width: 680px; margin: 0 auto; padding: 60px 24px; }
 
-        /* CONTENT HEADER */
-        h1 { font-size: 2.2rem; margin: 0 0 10px 0; color: #fff; letter-spacing: -1px; }
-        .meta { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px dashed var(--border-color); }
+        /* HEADER POSTINGAN */
+        .post-header { margin-bottom: 40px; border-bottom: 1px dashed #333; padding-bottom: 20px; }
+        
+        .post-title { 
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            color: #fff; 
+            margin: 0 0 15px 0; 
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
 
-        /* ISI KONTEN (PENTING: white-space pre-wrap biar Enter kebaca) */
-        .content {
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .author-link { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .author-link:hover { text-decoration: underline; }
+
+        /* ISI KONTEN */
+        .post-content {
             font-size: 1.1rem;
-            white-space: pre-wrap; /* INI KUNCINYA BIAR GAK NYATU SEMUA */
+            color: #e0e0e0;
+            white-space: pre-wrap; /* Biar enter/paragraf kebaca */
         }
-        
-        /* TOMBOL DELETE (KECIL DI BAWAH) */
-        .actions { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;}
-        .btn-delete { color: #ff6b6b; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; border: none; background: none; cursor: pointer; }
-        .btn-delete:hover { text-decoration: underline; background: #330000; }
 
-        footer { text-align: center; margin-top: 80px; font-size: 0.8rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;}
+        /* TOMBOL DELETE (Clean Text) */
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 40px;
+            padding: 0;
+            opacity: 0.7;
+        }
+        .btn-delete:hover { opacity: 1; text-decoration: underline; }
+
     </style>
 </head>
 <body>
+
+    <header class="site-header">
+        <a href="/" class="brand">&larr; Home</a>
+        {{ if .IsLoggedIn }}
+            <a href="/profile">
+                <img src="{{ .UserAvatar }}" class="nav-avatar">
+            </a>
+        {{ end }}
+    </header>
+
     <div class="container">
-        <a href="/" class="back-link">&larr; ../back_to_root</a>
+        
+        <div class="post-header">
+            <h1 class="post-title">{{ .Post.Title }}</h1>
+            
+            <div class="post-meta">
+                <span>By</span>
+                <a href="/profile?id={{ .Post.User.ID }}" class="author-link">{{ .Post.User.Name }}</a>
+                <span>•</span>
+                <span>{{ .Post.CreatedAt.Format "02 Jan 2006" }}</span>
+            </div>
+        </div>
 
-        <article>
-            <header>
-                <h1>{{ .Title }}</h1>
-                <div class="meta">
-                    Logged at: {{ .CreatedAt.Format "02 Jan 2006, 15:04" }}
-                </div>
-            </header>
+        <div class="post-content">
+            {{ .Post.Content }}
+        </div>
 
-            <div class="content">{{ .Content }}</div>
-        </article>
+        {{ if .IsOwnPost }}
+            <div style="border-top: 1px solid #333; margin-top: 50px; padding-top: 20px;">
+                <span style="font-family:'JetBrains Mono'; font-size: 0.8rem; color: #555;">Author Zone:</span><br>
+<button class="btn-delete" onclick="deletePost('{{ .Post.ID }}')">[ Delete this Log ]</button></div>
+        {{ end }}
 
-        <div class="actions">
-                <button onclick="deletePost('{{ .ID }}')" class="btn-delete">[ Delete Log ]</button>        </div>
-
-        <footer>
-            // End of file
-        </footer>
     </div>
 
     <script>
         async function deletePost(id) {
-            if(!confirm("Are you sure you want to purge this log?")) return;
+            if (!confirm("Hapus tulisan ini selamanya?")) return;
+
             try {
-                const res = await fetch('/api/posts/' + id, { method: 'DELETE' });
-                if(res.ok) window.location.href = "/";
-            } catch(e) { alert("Error purging log."); }
+                const response = await fetch('/api/posts/' + id, { method: 'DELETE' });
+                if (response.ok) {
+                    window.location.href = "/"; // Balik ke Home kalau udah dihapus
+                } else {
+                    alert("Gagal hapus.");
+                }
+            } catch (e) {
+                alert("Error koneksi.");
+            }
         }
     </script>
+
 </body>
 </html>

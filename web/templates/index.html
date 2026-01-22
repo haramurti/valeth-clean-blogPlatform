@@ -32,7 +32,7 @@
 
         a { text-decoration: none; color: inherit; transition: 0.2s; }
         
-        /* --- HEADER (LEBAR FULL SCREEN) --- */
+        /* --- HEADER --- */
         .site-header {
             width: 100%;
             background-color: var(--bg-secondary); 
@@ -44,16 +44,14 @@
         }
 
         .header-inner {
-            /* SEKARANG FULL WIDTH (Gak ditahan di 720px lagi) */
             width: 100%;
             max-width: 100%; 
-            padding: 15px 40px; /* Padding pinggir agak gede biar enak diliat */
+            padding: 15px 40px; 
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Logo Kiri, Profil Kanan (Paling Aman) */
             align-items: center;
         }
 
-        /* CONTAINER ISI (TETAP KECIL DI TENGAH BIAR ENAK BACA) */
         .container {
             max-width: 720px; 
             margin: 0 auto;
@@ -61,11 +59,16 @@
         }
 
         /* LOGO KUMA (KIRI) */
-        .header-identity { display: flex; align-items: center; gap: 15px;margin-left: 400px; }
+        .header-identity { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+            /* HAPUS margin-left: 400px biar gak ancur pas di-zoom */
+        }
+        
         .brand { display: flex; flex-direction: column; gap: 0px; }
         .brand h1 { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700; margin: 0; color: #fff; }
         .brand .tagline { font-size: 0.7rem; color: var(--text-muted); font-style: italic; }
-        
 
         /* NAVIGASI KANAN (PROFILE) */
         .nav-links {
@@ -78,25 +81,16 @@
         .nav-links a:hover { color: var(--accent); text-decoration: underline; }
 
         /* FOTO PROFILE DI KANAN */
-        .nav-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            
-        }
+        .nav-profile { display: flex; align-items: center; gap: 12px; }
         
         .header-avatar-img {
             width: 32px; 
             height: 32px;
             border-radius: 50%;
             object-fit: cover;
-            
-            /* BORDER UNGU DIHAPUS */
             border: none;
             outline: none; 
-            
             transition: transform 0.2s;
-            
         }
         .header-avatar-img:hover { transform: scale(1.1); cursor: pointer; }
 
@@ -109,6 +103,7 @@
             font-size: 0.9rem; padding: 10px 16px;
             background: var(--bg-secondary);
             border-radius: 4px; border: none; 
+            white-space: nowrap; /* Biar teks gak turun ke bawah */
         }
         .btn-create:hover { background: #333; }
 
@@ -117,7 +112,7 @@
         .post-item { 
             display: block; 
             background-color: var(--bg-secondary); 
-            border: none; /* CLEAN LOOK */
+            border: none; 
             border-radius: 4px; 
             overflow: hidden; 
             transition: transform 0.2s ease;
@@ -200,10 +195,30 @@
     </header>
 
     <div class="container">
-        <div class="action-bar">
+        
+        <div class="action-bar" style="display: flex; gap: 20px; align-items: center;">
             <a href="/create" class="btn-create">
                 <span>+</span> New Entry / 新しい日記
             </a>
+
+            <form action="/" method="GET" style="flex-grow: 1;">
+                <input type="text" 
+                       name="search" 
+                       placeholder="Search title, content, or writer..." 
+                       autocomplete="off"
+                       style="
+                           width: 100%;
+                           background: transparent;
+                           border: none;
+                           border-bottom: 1px solid #333;
+                           color: #d5d5d5;
+                           font-family: 'JetBrains Mono', monospace;
+                           font-size: 0.9rem;
+                           padding: 8px 0;
+                           outline: none;
+                       "
+                >
+            </form>
         </div>
 
         <div class="post-list">

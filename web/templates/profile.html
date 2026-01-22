@@ -16,7 +16,7 @@
             --text-main: #d5d5d5;     
             --text-muted: #939598;    
             --accent: #a882ff;        
-            --border-color: #333;  
+            --danger: #ff5f5f; /* Warna Merah buat Delete */
         }
 
         body { 
@@ -29,23 +29,23 @@
         
         a { text-decoration: none; color: inherit; transition: 0.2s; }
         
-        /* HEADER NAV (Sama kayak Index) */
+        /* HEADER NAV */
         .site-header {
             border-bottom: 1px solid #2f2f2f;
             padding: 10px 24px;
             display: flex; justify-content: space-between; align-items: center;
         }
         .brand { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #fff; font-size: 0.9rem;}
-        .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid #444; }
+        .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: none; }
 
         .container { max-width: 720px; margin: 0 auto; padding: 40px 24px; }
 
-        /* --- PROFILE IDENTITY SECTION --- */
+        /* PROFILE IDENTITY */
         .profile-header {
-            text-align: center; /* Center layout ala Bear Blog */
+            text-align: center; 
             margin-bottom: 60px;
             padding-bottom: 30px;
-            border-bottom: 1px dashed #333; /* Garis putus-putus estetik */
+            border-bottom: 1px dashed #333; 
         }
 
         .profile-avatar-big {
@@ -71,32 +71,57 @@
             margin-top: 5px;
         }
 
-        /* --- POST LIST (CLEAN) --- */
+        /* POST LIST */
         .post-list { display: flex; flex-direction: column; gap: 40px; }
         
-        .post-item { 
-            display: block; 
-            transition: opacity 0.2s;
+        /* Container Item biar tombol delete bisa ditaruh di kanan */
+        .post-item-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+ /* Buat deteksi hover */
         }
-        .post-item:hover { opacity: 0.8; }
+
+        .post-link { 
+            display: block; 
+            flex-grow: 1;
+        }
+        .post-link:hover .post-title { color: var(--accent); }
 
         .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; display: block; }
-        .post-title { font-size: 1.5rem; font-weight: 700; color: #fff; margin: 0 0 8px 0; }
+        .post-title { font-size: 1.5rem; font-weight: 700; color: #fff; margin: 0 0 8px 0; transition: 0.2s; }
         .post-preview { font-size: 1rem; color: #b0b3b8; margin: 0; line-height: 1.6; }
         
-        .empty-state {
-            text-align: center;
+        /* TOMBOL DELETE (Hidden by default, muncul pas hover) */
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
             font-family: 'JetBrains Mono', monospace;
-            color: #555;
-            padding: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            opacity: 0; /* Sembunyi dulu */
+            transition: 0.2s;
         }
+        
+        /* Pas mouse hover di postingan, tombol delete muncul */
+        .post-item-container:hover .btn-delete {
+            opacity: 1;
+        }
+
+        .btn-delete:hover {
+            color: var(--danger);
+            text-decoration: underline;
+        }
+
+        .empty-state { text-align: center; font-family: 'JetBrains Mono', monospace; color: #555; padding: 40px; }
     </style>
 </head>
 <body>
 
     <header class="site-header">
         <a href="/" class="brand">&larr; kuma-blog / Home</a>
-        
         {{ if .IsLoggedIn }}
             <a href="/profile">
                 <img src="{{ .UserAvatar }}" class="nav-avatar">
@@ -116,7 +141,8 @@
             <h1 class="profile-name">{{ .ProfileUser.Name }}</h1>
             
             <div class="profile-meta">
-                <span>Member since 2026</span> {{ if .IsOwnProfile }}
+                <span>Member since 2026</span> 
+                {{ if .IsOwnProfile }}
                     <span style="color: var(--accent);"> • ( It's You! )</span>
                 {{ end }}
             </div>
@@ -124,11 +150,17 @@
 
         <div class="post-list">
             {{ range .Posts }}
-                <a href="/post?id={{ .ID }}" class="post-item">
-                    <span class="post-date">{{ .CreatedAt.Format "Jan 02, 2006" }}</span>
-                    <h2 class="post-title">{{ .Title }}</h2>
-                    <p class="post-preview">{{ .Content }}</p>
-                </a>
+                <div class="post-item-container">
+                    <a href="/post?id={{ .ID }}" class="post-link">
+                        <span class="post-date">{{ .CreatedAt.Format "Jan 02, 2006" }}</span>
+                        <h2 class="post-title">{{ .Title }}</h2>
+                        <p class="post-preview">{{ .Content }}</p>
+                    </a>
+
+                    {{ if $.IsOwnProfile }}
+                        <button class="btn-delete" onclick="confirmDelete('{{ .ID }}')">[ delete ]</button>
+                    {{ end }}
+                </div>
             {{ else }}
                 <div class="empty-state">
                     ~ No logs recorded yet ~
@@ -137,6 +169,32 @@
         </div>
 
     </div>
+
+    <script>
+        async function confirmDelete(id) {
+            // 1. Tanya Dulu (Konfirmasi)
+            if (!confirm("Yakin mau menghapus log ini? Gak bisa balik lho.")) {
+                return;
+            }
+
+            // 2. Tembak API Delete
+            try {
+                const response = await fetch('/api/posts/' + id, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    // Kalau sukses, refresh halaman biar ilang
+                    window.location.reload();
+                } else {
+                    const data = await response.json();
+                    alert("Gagal hapus: " + data.message);
+                }
+            } catch (err) {
+                alert("Error koneksi server");
+            }
+        }
+    </script>
 
 </body>
 </html>
