@@ -1,36 +1,32 @@
 package middleware
 
 import (
-	"fmt"
-	"strconv"
+	"valeth-clean-blogPlatform/internal/utils" // Import file jwt.go kamu
 
 	"github.com/gofiber/fiber/v2"
 )
 
 // Ini Satpamnya
 func AuthProtected(c *fiber.Ctx) error {
+	// 1. Ambil Token dari Cookie bernama "jwt_token"
+	tokenString := c.Cookies("jwt_token")
 
-	fmt.Println("👮 [SATPAM] Middleware Jalan di rute:", c.Path())
-
-	// 1. CEK COOKIE
-	cookieUserID := c.Cookies("user_id")
-
-	// CCTV (Debugging)
-	fmt.Printf("[SATPAM] Cek Rute: %s | Cookie: '%s'\n", c.Path(), cookieUserID)
-
-	if cookieUserID == "" {
-		fmt.Println("[SATPAM] 🚫 Gak ada tiket! Redirect ke /login")
+	// Kalau gak ada token, tendang ke login
+	if tokenString == "" {
 		return c.Redirect("/login")
 	}
 
-	// 2. PARSING ID
-	userID, err := strconv.Atoi(cookieUserID)
+	// 2. Buka Segel Token (Validasi)
+	// Kita pake fungsi ParseToken yang udah kamu buat di utils/jwt.go
+	userID, err := utils.ParseToken(tokenString)
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{"message": "Invalid User ID"})
+		// Kalau token rusak/palsu, tendang ke login
+		return c.Redirect("/login")
 	}
 
-	// 3. SIMPAN DATA DI SAKU
-	c.Locals("user_id", userID)
+	// 3. Simpan User ID asli di saku (Locals) biar bisa dipake di Handler selanjutnya
+	c.Locals("user_id", int(userID))
 
 	return c.Next()
+
 }

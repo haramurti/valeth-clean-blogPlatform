@@ -10,6 +10,7 @@ import (
 	"time"
 	"valeth-clean-blogPlatform/config"
 	"valeth-clean-blogPlatform/internal/domain"
+	"valeth-clean-blogPlatform/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -111,22 +112,9 @@ func (h *AuthHandler) GoogleCallback(c *fiber.Ctx) error {
 	}
 	// --------------------------
 
-	// F. KASUS: USER ADA -> LANGSUNG LOGIN
-	c.Cookie(&fiber.Cookie{
-		Name:     "user_id",
-		Value:    fmt.Sprintf("%d", user.ID),
-		Expires:  time.Now().Add(24 * time.Hour),
-		HTTPOnly: true,
-	})
-
-	c.Cookie(&fiber.Cookie{
-		Name:     "avatar",
-		Value:    user.Avatar, // Simpan link foto Google
-		Expires:  time.Now().Add(24 * time.Hour),
-		HTTPOnly: true, // Biar aman
-	})
-
-	return c.Redirect("/")
+	// ✅ CUKUP TULIS SATU BARIS INI AJA
+	// Fungsi ini otomatis bikin token JWT DAN set cookie avatar buat kamu.
+	return h.generateTokenAndLogin(c, user.ID, user.Avatar)
 }
 
 // --- 3. FINALISASI REGISTER (NANGKEP FORM HTML) ---
@@ -157,36 +145,34 @@ func (h *AuthHandler) RegisterFinal(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Gagal simpan user: " + err.Error())
 	}
 
-	// E. Auto Login (Kasih Cookie)
-	c.Cookie(&fiber.Cookie{
-		Name:     "user_id",
-		Value:    fmt.Sprintf("%d", newUser.ID), // ID baru dari DB
-		Expires:  time.Now().Add(24 * time.Hour),
-		HTTPOnly: true,
-	})
-
-	c.Cookie(&fiber.Cookie{
-		Name:     "avatar",
-		Value:    newUser.Avatar, // Simpan link foto Google
-		Expires:  time.Now().Add(24 * time.Hour),
-		HTTPOnly: true, // Biar aman
-	})
-
-	// F. Masuk ke Home
-	return c.Redirect("/")
+	// ✅ CUKUP TULIS SATU BARIS INI AJA
+	// Fungsi ini otomatis bikin token JWT DAN set cookie avatar buat kamu.
+	return h.generateTokenAndLogin(c, newUser.ID, newUser.Avatar)
 }
 
 // --- 4. LOGOUT ---
 func (h *AuthHandler) Logout(c *fiber.Ctx) error {
+	// Hapus cookie JWT
+	c.Cookie(&fiber.Cookie{
+		Name:    "jwt_token",
+		Expires: time.Now().Add(-1 * time.Hour),
+	})
+	c.Cookie(&fiber.Cookie{
+		Name:    "avatar",
+		Expires: time.Now().Add(-1 * time.Hour),
+	})
+	// Bersih-bersih cookie lama
 	c.Cookie(&fiber.Cookie{
 		Name:    "user_id",
-		Expires: time.Now().Add(-1 * time.Hour), // Expire masa lalu
+		Expires: time.Now().Add(-1 * time.Hour),
 	})
+
 	return c.Redirect("/")
 }
 
 // ... import ...
 
+///baru 23 Jumat
 //register Manual baru kamis 22
 
 // --- [BARU] PROSES REGISTER MANUAL ---
@@ -233,17 +219,31 @@ func (h *AuthHandler) ProcessLoginManual(c *fiber.Ctx) error {
 	}
 
 	// Set Cookie ID
+	// ✅ CUKUP TULIS SATU BARIS INI AJA
+	// Fungsi ini otomatis bikin token JWT DAN set cookie avatar buat kamu.
+	return h.generateTokenAndLogin(c, user.ID, user.Avatar)
+}
+
+// 👇 INI FUNGSI BARU (Belum ada sebelumnya)
+func (h *AuthHandler) generateTokenAndLogin(c *fiber.Ctx, userID uint, avatar string) error {
+	// 1. PANGGIL ALAT UTILS: Bikin token terenkripsi dari ID User
+	token, err := utils.GenerateToken(userID)
+	if err != nil {
+		return c.Status(500).SendString("Gagal bikin token JWT")
+	}
+
+	// 2. SIMPAN DI COOKIE "jwt_token" (Bukan "user_id" lagi)
 	c.Cookie(&fiber.Cookie{
-		Name:     "user_id",
-		Value:    fmt.Sprintf("%d", user.ID),
+		Name:     "jwt_token", // <--- Nama cookie berubah
+		Value:    token,       // <--- Isinya kode acak panjang (eyJ...), bukan angka "7"
 		Expires:  time.Now().Add(24 * time.Hour),
-		HTTPOnly: true,
+		HTTPOnly: true, // <--- Aman dari hack JavaScript
 	})
 
-	// Set Cookie Avatar (PENTING BIAR FOTO MUNCUL)
+	// 3. Cookie Avatar (Ini tetep sama, cuma buat tampilan)
 	c.Cookie(&fiber.Cookie{
 		Name:     "avatar",
-		Value:    user.Avatar,
+		Value:    avatar,
 		Expires:  time.Now().Add(24 * time.Hour),
 		HTTPOnly: true,
 	})

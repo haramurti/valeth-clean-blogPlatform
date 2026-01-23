@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"valeth-clean-blogPlatform/internal/domain"
+	"valeth-clean-blogPlatform/internal/utils"
 
 	"valeth-clean-blogPlatform/internal/middleware"
 
@@ -186,23 +187,17 @@ func (h *PostHandler) PageHome(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Error database bro: " + err.Error())
 	}
 
-	// 2. Cek Cookie Login & Avatar
-	cookieUserID := c.Cookies("user_id")
+	//baru jumat 23 jan 2026
+	// 2. CEK LOGIN PAKE HELPER BARU
+	myID := h.getMyUserID(c) // <--- Panggil fungsi bantuan tadi
+	isLoggedIn := myID != 0  // Kalau ID bukan 0, berarti Login
 
-	// --- [BARIS BARU] AMBIL FOTO DARI SAKU ---
-	cookieAvatar := c.Cookies("avatar")
-	// -----------------------------------------
-
-	isLoggedIn := cookieUserID != ""
-
-	// 3. Kirim Data Lengkap ke HTML
+	// 3. Render
 	return c.Render("index", fiber.Map{
-		"Posts":      posts,
-		"IsLoggedIn": isLoggedIn,
-
-		// --- [BARIS BARU] KIRIM KE FRONTEND ---
-		"UserAvatar": cookieAvatar,
-		// --------------------------------------
+		"Posts":       posts,
+		"IsLoggedIn":  isLoggedIn,
+		"UserAvatar":  c.Cookies("avatar"), // Avatar gapapa baca cookie langsung, gak bahaya
+		"SearchQuery": searchKeyword,
 	})
 }
 
@@ -217,23 +212,17 @@ func (h *PostHandler) PagePostDetail(c *fiber.Ctx) error {
 		return c.Status(404).Render("404", nil)
 	}
 
-	// 2. Cek Siapa yang Login (Dari Cookie)
-	cookieUserID := c.Cookies("user_id")
-	var myID int
-	fmt.Sscanf(cookieUserID, "%d", &myID)
+	//baru 23 jumat 2026
+	myID := h.getMyUserID(c)
 
-	// 3. Cek Kepemilikan (Apakah UserID postingan == UserID login?)
+	// 2. Bandingkan ID Login vs Pemilik Post
 	isOwnPost := (post.UserID == uint(myID))
 
-	// 4. Ambil Avatar buat Header
-	cookieAvatar := c.Cookies("avatar")
-
-	// 5. Kirim ke HTML (Pake fiber.Map biar bisa kirim banyak data)
 	return c.Render("post", fiber.Map{
-		"Post":       post,         // Isinya: Title, Content, User, dll
-		"IsOwnPost":  isOwnPost,    // Isinya: true/false
-		"IsLoggedIn": myID != 0,    // Buat Header
-		"UserAvatar": cookieAvatar, // Buat Header
+		"Post":       post,
+		"IsOwnPost":  isOwnPost,
+		"IsLoggedIn": myID != 0,
+		"UserAvatar": c.Cookies("avatar"),
 	})
 }
 
@@ -255,60 +244,61 @@ func (h *PostHandler) PageCreate(c *fiber.Ctx) error {
 
 // ... import dan kode lain ...
 
+// kode baaru jumat 23 2026
 func (h *PostHandler) PageProfile(c *fiber.Ctx) error {
-	// 1. Cek ID siapa yang mau dilihat?
-	// Kalau ada ?id=5 di URL, pakai itu.
 	targetID := c.QueryInt("id")
 
-	// 2. Ambil ID kita sendiri dari Cookie (buat cek login & fallback)
-	myCookieID := c.Cookies("user_id")
-	var myID int
-	fmt.Sscanf(myCookieID, "%d", &myID)
+	// 1. CEK LOGIN PAKE HELPER BARU
+	myID := h.getMyUserID(c)
 
-	// Kalau URL gak ada ?id=..., berarti user mau liat profil sendiri
+	// Logika: Kalau gak ada targetID di URL, berarti mau liat profil sendiri
 	if targetID == 0 {
 		if myID != 0 {
 			targetID = myID
 		} else {
-			// Kalau gak ada ID target DAN belum login -> Tendang ke Login
 			return c.Redirect("/login")
 		}
 	}
 
-	// 3. Ambil Data Postingan milik Target ID
 	posts, err := h.postUseCase.FetchByUserID(targetID)
 	if err != nil {
-		return c.Status(500).SendString("Gagal ambil post: " + err.Error())
+		return c.Status(500).SendString("Error: " + err.Error())
 	}
-
-	// 4. Ambil Data User Target (Dari postingan pertama aja biar hemat query)
-	// Trik: Kalau dia punya postingan, data user ada di posts[0].User
-	// Kalau dia GAK punya postingan, kita harus query manual (PR nanti),
-	// tapi sementara kita handle kalau posts ada isinya aja.
 
 	var profileUser domain.User
 	if len(posts) > 0 {
 		profileUser = posts[0].User
 	} else {
-		// TODO: Kalau user belum pernah posting, idealnya kita fetch user by ID lewat UserUseCase.
-		// Tapi biar cepet, kita kosongin dulu atau redirect home.
-		// return c.Redirect("/")
-		// Biar ga error, kita bikin dummy user (atau fetch manual via repo user kalau lu udah siapin)
-		profileUser.Name = "New Member"
+		// (Optional) Fetch user data manual kalo postingan kosong
+		profileUser.Name = "Member"
 		profileUser.Avatar = "https://api.dicebear.com/9.x/micah/svg?seed=new"
 	}
 
-	// 5. Cek apakah ini profil kita sendiri? (Buat nampilin tombol Edit nanti)
+	// 2. Bandingkan ID Login vs Target Profil
 	isOwnProfile := (targetID == myID)
-
-	// 6. Data buat Header (Cookie)
-	cookieAvatar := c.Cookies("avatar")
 
 	return c.Render("profile", fiber.Map{
 		"Posts":        posts,
-		"ProfileUser":  profileUser, // Data pemilik profil
+		"ProfileUser":  profileUser,
 		"IsOwnProfile": isOwnProfile,
 		"IsLoggedIn":   myID != 0,
-		"UserAvatar":   cookieAvatar, // Data foto kita di pojok kanan atas
+		"UserAvatar":   c.Cookies("avatar"),
 	})
+}
+
+// --- HELPER BUAT POST HANDLER ---
+// Tugas: Cek "Siapa sih yang lagi login?" dengan baca JWT
+func (h *PostHandler) getMyUserID(c *fiber.Ctx) int {
+	tokenString := c.Cookies("jwt_token")
+	if tokenString == "" {
+		return 0 // Gak ada token = Belum login
+	}
+
+	// Buka segel token
+	userID, err := utils.ParseToken(tokenString)
+	if err != nil {
+		return 0 // Token rusak/palsu = Belum login
+	}
+
+	return int(userID)
 }
