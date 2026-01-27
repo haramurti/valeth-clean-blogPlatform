@@ -3,11 +3,11 @@ package domain
 import "time"
 
 type User struct {
-	ID       uint   `json:"id" gorm:"primaryKey"`
-	GoogleID string `json:"google_id" gorm:"uniqueIndex"` // Kunci utama login Google
-	Email    string `json:"email" gorm:"uniqueIndex"`     // Email harus unik
-	Name     string `json:"name"`
-	Avatar   string `json:"avatar"` // URL foto profil Google
+	ID       uint    `json:"id" gorm:"primaryKey"`
+	GoogleID *string `gorm:"unique;default:null"`
+	Email    string  `json:"email" gorm:"uniqueIndex"` // Email harus unik
+	Name     string  `json:"name"`
+	Avatar   string  `json:"avatar"` // URL foto profil Google
 
 	Password string `json:"-"`
 

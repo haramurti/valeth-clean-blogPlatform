@@ -11,12 +11,12 @@
 
     <style>
         :root {
-            --bg-main: #181818;       
+            --bg-main: #121212;       
             --bg-secondary: #262626;  
-            --text-main: #d5d5d5;     
+            --text-main: #ffffff;     
             --text-muted: #939598;    
             --accent: #a882ff;        
-            --danger: #ff5f5f; /* Warna Merah buat Delete */
+            --danger: #ff5f5f; 
         }
 
         body { 
@@ -36,7 +36,28 @@
             display: flex; justify-content: space-between; align-items: center;
         }
         .brand { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #fff; font-size: 0.9rem;}
-        .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: none; }
+        
+        /* --- [NEW] NAV RIGHT (Logout + Avatar) --- */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+
+        .btn-logout {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--danger); /* Merah */
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-logout:hover {
+            text-decoration: underline;
+            color: #ff8080;
+        }
+
+        .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: none; display: block; }
 
         .container { max-width: 720px; margin: 0 auto; padding: 40px 24px; }
 
@@ -48,72 +69,67 @@
             border-bottom: 1px dashed #333; 
         }
 
-        .profile-avatar-big {
-            width: 100px; height: 100px;
+        /* AVATAR UPLOAD STYLES */
+        .avatar-wrapper {
+            position: relative;
+            width: 100px; 
+            height: 100px;
+            margin: 0 auto 15px auto;
             border-radius: 50%;
-            object-fit: cover;
+            overflow: hidden; 
             border: 4px solid var(--bg-secondary);
-            margin-bottom: 15px;
         }
 
+        .profile-avatar-big { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .profile-avatar-placeholder {
+            width: 100%; height: 100%; background: #333; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: #777;
+        }
+
+        .avatar-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.2s ease; cursor: pointer;
+        }
+
+        .avatar-wrapper:hover .avatar-overlay { opacity: 1; }
+
+        .camera-icon { width: 24px; height: 24px; color: #fff; margin-bottom: 4px; }
+        .overlay-text { font-size: 0.6rem; font-family: 'JetBrains Mono', monospace; color: #fff; text-transform: uppercase; }
+
         .profile-name {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #fff;
-            margin: 0;
-            letter-spacing: -0.5px;
+            font-size: 2rem; font-weight: 800; color: #fff; margin: 0; letter-spacing: -0.5px;
         }
 
         .profile-meta {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 5px;
+            font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;
         }
 
         /* POST LIST */
         .post-list { display: flex; flex-direction: column; gap: 40px; }
         
-        /* Container Item biar tombol delete bisa ditaruh di kanan */
-        .post-item-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
- /* Buat deteksi hover */
-        }
+        .post-item-container { display: flex; justify-content: space-between; align-items: flex-start; }
 
-        .post-link { 
-            display: block; 
-            flex-grow: 1;
-        }
+        .post-link { display: block; flex-grow: 1; }
         .post-link:hover .post-title { color: var(--accent); }
 
         .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; display: block; }
         .post-title { font-size: 1.5rem; font-weight: 700; color: #fff; margin: 0 0 8px 0; transition: 0.2s; }
         .post-preview { font-size: 1rem; color: #b0b3b8; margin: 0; line-height: 1.6; }
         
-        /* TOMBOL DELETE (Hidden by default, muncul pas hover) */
         .btn-delete {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            cursor: pointer;
-            padding: 5px 10px;
-            opacity: 0; /* Sembunyi dulu */
-            transition: 0.2s;
+            background: none; border: none;
+            color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem; cursor: pointer;
+            padding: 5px 10px; opacity: 0; transition: 0.2s;
         }
         
-        /* Pas mouse hover di postingan, tombol delete muncul */
-        .post-item-container:hover .btn-delete {
-            opacity: 1;
-        }
-
-        .btn-delete:hover {
-            color: var(--danger);
-            text-decoration: underline;
-        }
+        .post-item-container:hover .btn-delete { opacity: 1; }
+        .btn-delete:hover { color: var(--danger); text-decoration: underline; }
 
         .empty-state { text-align: center; font-family: 'JetBrains Mono', monospace; color: #555; padding: 40px; }
     </style>
@@ -122,21 +138,41 @@
 
     <header class="site-header">
         <a href="/" class="brand">&larr; kuma-blog / Home</a>
+        
         {{ if .IsLoggedIn }}
-            <a href="/profile">
-                <img src="{{ .UserAvatar }}" class="nav-avatar">
-            </a>
+            <div class="nav-right">
+                <a href="/auth/logout" class="btn-logout">Logout -></a>
+                
+                <a href="/profile">
+                    <img src="{{ .UserAvatar }}" class="nav-avatar">
+                </a>
+            </div>
         {{ end }}
     </header>
 
     <div class="container">
         
         <div class="profile-header">
-            {{ if .ProfileUser.Avatar }}
-                <img src="{{ .ProfileUser.Avatar }}" alt="{{ .ProfileUser.Name }}" class="profile-avatar-big">
-            {{ else }}
-                <div class="profile-avatar-big" style="background: #333; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;">?</div>
-            {{ end }}
+            
+            <div class="avatar-wrapper" {{ if .IsOwnProfile }} onclick="triggerUpload()" {{ end }}>
+                {{ if .ProfileUser.Avatar }}
+                    <img src="{{ .ProfileUser.Avatar }}" alt="{{ .ProfileUser.Name }}" class="profile-avatar-big">
+                {{ else }}
+                    <div class="profile-avatar-placeholder">?</div>
+                {{ end }}
+
+                {{ if .IsOwnProfile }}
+                    <div class="avatar-overlay">
+                        <svg class="camera-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span class="overlay-text">Change</span>
+                    </div>
+                    
+                    <input type="file" id="avatarInput" hidden accept="image/png, image/jpeg, image/jpg">
+                {{ end }}
+            </div>
 
             <h1 class="profile-name">{{ .ProfileUser.Name }}</h1>
             
@@ -171,28 +207,58 @@
     </div>
 
     <script>
+        // --- LOGIC HAPUS POST ---
         async function confirmDelete(id) {
-            // 1. Tanya Dulu (Konfirmasi)
-            if (!confirm("Yakin mau menghapus log ini? Gak bisa balik lho.")) {
-                return;
-            }
+            if (!confirm("Yakin mau menghapus log ini? Gak bisa balik lho.")) return;
 
-            // 2. Tembak API Delete
             try {
-                const response = await fetch('/api/posts/' + id, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    // Kalau sukses, refresh halaman biar ilang
-                    window.location.reload();
-                } else {
+                const response = await fetch('/api/posts/' + id, { method: 'DELETE' });
+                if (response.ok) window.location.reload();
+                else {
                     const data = await response.json();
                     alert("Gagal hapus: " + data.message);
                 }
             } catch (err) {
                 alert("Error koneksi server");
             }
+        }
+
+        // --- LOGIC UPLOAD AVATAR ---
+        function triggerUpload() {
+            const input = document.getElementById('avatarInput');
+            if (input) input.click();
+        }
+
+        const avatarInput = document.getElementById('avatarInput');
+        if (avatarInput) {
+            avatarInput.addEventListener('change', async function(e) {
+                if (e.target.files.length === 0) return;
+
+                const file = e.target.files[0];
+                const formData = new FormData();
+                formData.append('avatar', file);
+
+                document.body.style.cursor = 'wait';
+
+                try {
+                    const response = await fetch('/profile/avatar', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        window.location.reload(); 
+                    } else {
+                        const data = await response.json();
+                        alert("Gagal upload: " + (data.error || "Unknown error"));
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Terjadi kesalahan koneksi saat upload.");
+                } finally {
+                    document.body.style.cursor = 'default';
+                }
+            });
         }
     </script>
 

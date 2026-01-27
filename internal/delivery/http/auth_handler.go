@@ -132,9 +132,17 @@ func (h *AuthHandler) RegisterFinal(c *fiber.Ctx) error {
 		return c.Status(400).SendString("Gagal baca form: " + err.Error())
 	}
 
+	// --- LOGIC TAMBAHAN (FIX POINTER) ---
+	// Kita cek dulu: Kalau kosong "", kita paksa jadi nil biar Database seneng (NULL).
+	var googleIDPtr *string
+	if form.GoogleID != "" {
+		googleIDPtr = &form.GoogleID
+	}
+	// ------------------------------------
+
 	// C. Masukin ke Struct Domain
 	newUser := domain.User{
-		GoogleID: form.GoogleID,
+		GoogleID: googleIDPtr, // ✅ Sekarang tipe datanya udah pas (*string)
 		Email:    form.Email,
 		Name:     form.Name,
 		Avatar:   form.Avatar,
@@ -145,8 +153,7 @@ func (h *AuthHandler) RegisterFinal(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Gagal simpan user: " + err.Error())
 	}
 
-	// ✅ CUKUP TULIS SATU BARIS INI AJA
-	// Fungsi ini otomatis bikin token JWT DAN set cookie avatar buat kamu.
+	// ✅ Generate Token & Cookie
 	return h.generateTokenAndLogin(c, newUser.ID, newUser.Avatar)
 }
 

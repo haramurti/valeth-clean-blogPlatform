@@ -1,7 +1,7 @@
 package infrastructure
 
 import (
-	"bytes" // <--- WAJIB: Buat convert []byte ke io.Reader
+	"bytes"
 	"fmt"
 	"os"
 
@@ -30,45 +30,43 @@ func NewSupabaseStorage() *SupabaseStorage {
 	}
 }
 
-// Fitur: Initialize Bucket (Cek Koneksi)
+// Fitur: Initialize Bucket
 func (s *SupabaseStorage) InitializeBucket() {
-	fmt.Println("⚡ Menghubungkan ke Supabase Storage...")
-
-	// PERBAIKAN LIST:
-	// List() di library ini mengembalikan []FileObject (1 value), bukan error.
-	// Kita tes koneksi dengan mencoba melist 1 file saja.
-	results := s.Client.Storage.From(s.Bucket).List("", supabase.FileSearchOptions{
-		Limit: 1,
-	})
-
-	// Kalau results tidak nil (meskipun kosong), berarti koneksi ke bucket "nyambung".
-	// (Library ini gak return error eksplisit di List, jadi kita assume sukses kalo gak panic)
-	fmt.Printf("✅ Supabase Storage Connected! Bucket: %s (Found %d items)\n", s.Bucket, len(results))
+	// Kita skip cek List biar gak panic
+	fmt.Printf("⚡ Supabase Config Loaded. Target Bucket: %s\n", s.Bucket)
 }
 
 // Fitur: Upload File
+// Fitur: Upload File
 func (s *SupabaseStorage) UploadFile(fileBytes []byte, filename string, contentType string) (string, error) {
 
-	var upsert = true
+	// 👇 1. DEBUGGING AWAL (Cek apa yang dikirim)
+	fmt.Println("\n--- 🕵️‍♂️ DEBUG UPLOAD START ---")
+	fmt.Printf("Target Bucket : '%s'\n", s.Bucket) // Penting! Cek ini di terminal nanti
+	fmt.Printf("Nama File     : %s\n", filename)
+	fmt.Printf("Ukuran File   : %d bytes\n", len(fileBytes))
 
-	// 1. UPLOAD KE SUPABASE
-	// Perbaikan: Tangkap hasilnya ke variabel 'resp' (bukan err)
+	// 2. UPLOAD KE SUPABASE
 	resp := s.Client.Storage.From(s.Bucket).Upload(filename, bytes.NewReader(fileBytes), &supabase.FileUploadOptions{
 		ContentType: contentType,
-		Upsert:      upsert,
+		Upsert:      true,
 	})
 
-	// Cek manual: Kalau Key kosong, berarti gagal (karena library ini return struct, bukan error)
+	// 👇 3. DEBUGGING HASIL (Cek apa balasannya)
+	fmt.Printf("Status Response: %+v\n", resp) // Print isinya (Key, Id, dll)
+
+	// Cek manual
 	if resp.Key == "" {
-		return "", fmt.Errorf("gagal upload, tidak ada key yang dikembalikan")
+		fmt.Println("❌ ERROR: Key Kosong! Kemungkinan bucket tidak ketemu atau ditolak Policy.")
+		fmt.Println("--------------------------------")
+		return "", fmt.Errorf("gagal upload: Key kosong. Pastikan bucket '%s' ada & Policy INSERT aktif", s.Bucket)
 	}
 
-	// 2. GENERATE PUBLIC URL
-	// Perbaikan: Hasilnya adalah struct, kita ambil string URL-nya
-	urlData := s.Client.Storage.From(s.Bucket).GetPublicUrl(filename)
+	fmt.Println("✅ SUKSES: Key didapat ->", resp.Key)
+	fmt.Println("--------------------------------")
 
-	// Di library nedpals, hasil URL-nya ada di field .SignedURL
-	// (Nama fieldnya memang SignedURL, tapi isinya Public URL kalau bucketnya public)
+	// 4. GENERATE PUBLIC URL
+	urlData := s.Client.Storage.From(s.Bucket).GetPublicUrl(filename)
 	publicURL := urlData.SignedUrl
 
 	return publicURL, nil
