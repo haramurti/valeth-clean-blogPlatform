@@ -87,6 +87,14 @@ func (h *ProfileHandler) UploadAvatar(c *fiber.Ctx) error {
 	}
 
 	// 7. Berhasil! Balikin URL-nya ke Frontend
+	c.Cookie(&fiber.Cookie{
+		Name:     "avatars",                      // Nama cookie harus sama persis
+		Value:    publicURL,                      // Isi dengan URL baru
+		Expires:  time.Now().Add(24 * time.Hour), // Samain durasinya kayak login
+		HTTPOnly: true,                           // Samain settingannya
+	})
+
+	// 7. Berhasil! Balikin URL-nya ke Frontend
 	return c.JSON(fiber.Map{
 		"message": "Avatar berhasil diganti!",
 		"url":     publicURL,

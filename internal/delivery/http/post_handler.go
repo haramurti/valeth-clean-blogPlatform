@@ -196,7 +196,7 @@ func (h *PostHandler) PageHome(c *fiber.Ctx) error {
 	return c.Render("index", fiber.Map{
 		"Posts":       posts,
 		"IsLoggedIn":  isLoggedIn,
-		"UserAvatar":  c.Cookies("avatar"), // Avatar gapapa baca cookie langsung, gak bahaya
+		"UserAvatar":  c.Cookies("avatars"), // Avatar gapapa baca cookie langsung, gak bahaya
 		"SearchQuery": searchKeyword,
 	})
 }
@@ -282,7 +282,7 @@ func (h *PostHandler) PageProfile(c *fiber.Ctx) error {
 		"ProfileUser":  profileUser,
 		"IsOwnProfile": isOwnProfile,
 		"IsLoggedIn":   myID != 0,
-		"UserAvatar":   c.Cookies("avatar"),
+		"UserAvatar":   c.Cookies("avatars"),
 	})
 }
 

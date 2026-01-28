@@ -100,18 +100,10 @@ func (h *AuthHandler) GoogleCallback(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Error database: " + err.Error())
 	}
 
-	// --- [PERBAIKAN DISINI] ---
-	// E. SYNC AVATAR: Update foto database kalau beda sama Google
-	if user.Avatar != googleUser.Picture {
-		// Update data di memory
+	if user.Avatar == "" {
 		user.Avatar = googleUser.Picture
-
-		// Panggil fungsi Update di Usecase (Pastikan fungsi ini ada!)
-		// Kalau error update, kita ignore aja (log doang), yang penting user tetep bisa login
 		_ = h.userUseCase.UpdateUser(&user)
 	}
-	// --------------------------
-
 	// ✅ CUKUP TULIS SATU BARIS INI AJA
 	// Fungsi ini otomatis bikin token JWT DAN set cookie avatar buat kamu.
 	return h.generateTokenAndLogin(c, user.ID, user.Avatar)
