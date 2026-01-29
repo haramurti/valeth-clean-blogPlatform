@@ -14,6 +14,7 @@ type Post struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	UserID    uint      `json:"user_id"` // Foreign Key
 	User      User      `json:"user,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Image     string    `json:"image" form:"image"`
 }
 
 type PostRepository interface {

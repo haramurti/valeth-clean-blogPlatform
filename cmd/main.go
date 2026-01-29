@@ -54,7 +54,7 @@ func main() {
 	httpDelivery.NewProfileHandler(app, userUseCase, supabaseStorage)
 
 	// Post Handler
-	httpDelivery.NewPostHandler(app, postUseCase)
+	httpDelivery.NewPostHandler(app, postUseCase, supabaseStorage)
 
 	// 6. Jalanin Server
 	log.Println("Server jalan di port 8080 bos!")

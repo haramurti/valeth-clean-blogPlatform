@@ -2,7 +2,11 @@ package http
 
 import (
 	"fmt"
+	"io"
+	"path/filepath"
+	"time"
 	"valeth-clean-blogPlatform/internal/domain"
+	"valeth-clean-blogPlatform/internal/infrastructure"
 	"valeth-clean-blogPlatform/internal/utils"
 
 	"valeth-clean-blogPlatform/internal/middleware"
@@ -14,12 +18,14 @@ import (
 type PostHandler struct {
 	// jadi ini dimana variabel yang mana fungsinya bisa kita pake buat di method nanti.
 	postUseCase domain.PostUseCase
+	storage     *infrastructure.SupabaseStorage // 👈 1. Tambah ini
 }
 
 // 2. Masukin pelayan
-func NewPostHandler(app *fiber.App, u domain.PostUseCase) {
+func NewPostHandler(app *fiber.App, u domain.PostUseCase, s *infrastructure.SupabaseStorage) {
 	handler := &PostHandler{
 		postUseCase: u,
+		storage:     s,
 	}
 
 	// 3. Daftar Menu
@@ -82,6 +88,29 @@ func (h *PostHandler) Store(c *fiber.Ctx) error {
 		})
 	}
 
+	fileHeader, err := c.FormFile("image")
+
+	// Kalau tidak error (artinya ada file), kita upload
+	if err == nil {
+		file, _ := fileHeader.Open()
+		defer file.Close()
+
+		fileBytes, _ := io.ReadAll(file) // Baca file jadi bytes
+
+		// Bikin nama unik: post-USERID-TIMESTAMP.jpg
+		userID := c.Locals("user_id").(int)
+		ext := filepath.Ext(fileHeader.Filename)
+		filename := fmt.Sprintf("post-%d-%d%s", userID, time.Now().Unix(), ext)
+
+		// Upload ke Supabase
+		imageURL, errUpload := h.storage.UploadFile(fileBytes, filename, fileHeader.Header.Get("Content-Type"))
+		if errUpload != nil {
+			return c.Status(500).JSON(fiber.Map{"message": "Gagal upload gambar: " + errUpload.Error()})
+		}
+
+		// Simpan URL ke struct Post
+		post.Image = imageURL
+	}
 	userID := c.Locals("user_id").(int) // Assert ke int
 
 	post.UserID = uint(userID)

@@ -3,202 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Entry - Valeth.md</title>
+    <title>Write New Story</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            /* Warna Body disamakan dengan Index (Quora Dark) */
-            --bg-main: #181818; 
-            --text-main: #d5d5d5;
-            --text-muted: #787c88;
-            --accent: #a882ff;
-            --accent-hover: #bfa3ff;
-            --border-color: #333333;
+            --bg-main: #121212;       
+            --bg-secondary: #242424;
+            --bg-input: #1e1e1e;  
+            --text-main: #ffffff;     
+            --text-muted: #939598;    
+            --accent: #a882ff;        
+            --border: #333;
         }
-        
+
         * { box-sizing: border-box; }
 
         body { 
-            background: var(--bg-main); 
-            color: var(--text-main); 
             font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            background-color: var(--bg-main); 
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            line-height: 1.6;
         }
 
+        /* --- NAVBAR --- */
+        .navbar {
+            height: 60px;
+            background-color: var(--bg-main);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; position: sticky; top: 0; z-index: 100;
+        }
+        .brand { 
+            font-family: 'JetBrains Mono', monospace; font-weight: 700; 
+            color: #fff; text-decoration: none; 
+        }
+        .nav-right a {
+            text-decoration: none; color: var(--text-muted); font-size: 0.9rem;
+            margin-left: 20px; transition: 0.2s;
+        }
+        .nav-right a:hover { color: #fff; }
+
+        /* --- CONTAINER UTAMA --- */
         .container { 
             max-width: 720px; 
-            margin: 0 auto; 
-            padding: 60px 24px 100px 24px; /* Padding bawah gede biar ga ketutupan tombol */
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
+            margin: 40px auto; 
+            padding: 0 24px; 
+        }
+
+        h1 { margin-bottom: 30px; font-weight: 800; letter-spacing: -1px; }
+
+        /* --- FORM STYLES --- */
+        .form-group { margin-bottom: 24px; }
+        
+        label { 
+            display: block; margin-bottom: 8px; 
+            font-weight: 600; color: var(--text-muted); font-size: 0.9rem;
+        }
+
+        .form-control {
             width: 100%;
-        }
-
-        /* FORM AREA - CLEAN OBSIDIAN STYLE */
-        #createForm {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            height: 100%;
-            flex-grow: 1;
-        }
-
-        /* INPUT JUDUL */
-        .input-title {
-            background: transparent;
-            border: none;
-            /* Gak ada border kotak, cuma garis bawah tipis pas diklik (opsional) */
-            border-bottom: 1px solid transparent; 
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
             color: #fff;
-            font-size: 2.5rem; /* Judul Gede */
-            font-weight: 800;
-            width: 100%;
-            outline: none;
-            padding: 10px 0;
+            padding: 12px 16px;
+            border-radius: 8px;
             font-family: 'Inter', sans-serif;
-            transition: border-color 0.3s;
-        }
-        
-        .input-title:focus { 
-            /* Pas diklik baru muncul garis tipis banget biar tau lagi ngetik dimana */
-            border-bottom-color: #333; 
-        }
-        
-        .input-title::placeholder { color: #444; }
-
-        /* TEXTAREA CONTENT */
-        .input-content {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            /* Font Monospace biar vibes-nya 'Old School' Markdown editor */
-            font-family: 'JetBrains Mono', monospace; 
-            font-size: 1.1rem;
-            line-height: 1.6;
-            width: 100%;
-            flex-grow: 1; /* Ngisi sisa layar ke bawah */
-            resize: none; 
-            outline: none;
-            min-height: 400px;
-        }
-        
-        .input-content::placeholder { color: #333; font-style: italic; }
-
-        /* FOOTER ACTIONS (Pojok Kanan Bawah) */
-        .action-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px 40px;
-            /* Gradient background dikit biar tombolnya kebaca kalo tulisan panjang */
-            background: linear-gradient(to top, var(--bg-main) 80%, transparent);
-            display: flex;
-            justify-content: flex-end; /* Mentok Kanan */
-            align-items: center;
-            gap: 20px;
-            z-index: 100;
-        }
-
-        .btn-cancel { 
-            font-family: 'JetBrains Mono', monospace; 
-            font-size: 0.9rem; 
-            color: var(--text-muted); 
-            text-decoration: none; 
+            font-size: 1rem;
             transition: 0.2s;
-            font-weight: 600;
-            background: none;
-            border: none;
-            cursor: pointer;
+            outline: none;
         }
-        .btn-cancel:hover { color: #fff; }
 
-        .btn-save {
-            background: var(--accent);
-            color: #1e1e1e;
-            font-family: 'JetBrains Mono', monospace;
+        /* Khusus Textarea */
+        textarea.form-control {
+            min-height: 300px;
+            line-height: 1.8;
+            resize: vertical;
+        }
+
+        /* Efek Fokus */
+        .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(168, 130, 255, 0.1);
+        }
+
+        /* Input File Custom */
+        input[type="file"] {
+            padding: 10px;
+            font-size: 0.85rem;
+            background: var(--bg-secondary);
+        }
+
+        /* Tombol Publish */
+        .btn-submit {
+            background-color: var(--accent);
+            color: #000;
             font-weight: 700;
             border: none;
             padding: 12px 24px;
+            border-radius: 50px;
             cursor: pointer;
-            font-size: 0.9rem;
-            border-radius: 4px; /* Radius kecil minimalis */
+            font-size: 1rem;
             transition: 0.2s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: inline-block;
         }
-        .btn-save:hover { background: var(--accent-hover); transform: translateY(-2px); }
-        .btn-save:disabled { background: #444; cursor: not-allowed; }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(168, 130, 255, 0.3);
+            background-color: #bfa1ff;
+        }
 
     </style>
 </head>
 <body>
 
+    <nav class="navbar">
+        <a href="/" class="brand">ʕ•ᴥ•ʔ kuma</a>
+        <div class="nav-right">
+            <a href="/">Cancel</a>
+        </div>
+    </nav>
+
     <div class="container">
-        <form id="createForm">
-            <input type="text" id="title" class="input-title" placeholder="Untitled Log..." required autocomplete="off" autofocus>
+        <h1>Tulis Postingan Baru</h1>
 
-            <textarea id="content" class="input-content" placeholder="Start typing system log here..." required></textarea>
-
-            <div class="action-footer">
-                <a href="/" class="btn-cancel">Cancel</a>
-                <button type="submit" class="btn-save">PUBLISH ENTRY</button>
+        <form id="createForm" enctype="multipart/form-data">
+            
+            <div class="form-group">
+                <label>Judul</label>
+                <input type="text" name="title" class="form-control" placeholder="Isikan judul menarik..." required autocomplete="off">
             </div>
+
+            <div class="form-group">
+                <label>Cover Image (Opsional)</label>
+                <input type="file" name="image" class="form-control" accept="image/png, image/jpeg, image/jpg">
+                <small style="color: #555; display: block; margin-top: 5px;">Format: JPG/PNG, Max 5MB</small>
+            </div>
+
+            <div class="form-group">
+                <label>Isi Tulisan</label>
+                <textarea name="content" class="form-control" placeholder="Mulai menulis ceritamu di sini..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">Publish Story</button>
         </form>
     </div>
 
     <script>
-        // Script Logic Posting (Masih sama, cuma beda UI)
         document.getElementById('createForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); 
-
-            const title = document.getElementById('title').value;
-            const content = document.getElementById('content').value;
-            const btn = document.querySelector('.btn-save');
+            e.preventDefault();
+            
+            // Ubah text tombol biar user tau lagi loading
+            const btn = document.querySelector('.btn-submit');
             const originalText = btn.innerText;
-
-            btn.innerText = "WRITING...";
+            btn.innerText = "Publishing...";
             btn.disabled = true;
+            btn.style.opacity = "0.7";
+            
+            // Pakai FormData biar bisa kirim File + Text sekaligus
+            const formData = new FormData(this); 
 
             try {
                 const response = await fetch('/api/posts', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title: title, content: content })
+                    body: formData // Browser otomatis set header multipart
                 });
 
                 if (response.ok) {
+                    // Sukses
                     window.location.href = "/";
                 } else {
-                    const err = await response.json();
-                    alert("Error: " + err.message);
+                    const data = await response.json();
+                    alert("Gagal: " + (data.message || "Terjadi kesalahan"));
+                    
+                    // Balikin tombol
                     btn.innerText = originalText;
                     btn.disabled = false;
+                    btn.style.opacity = "1";
                 }
-            } catch (error) {
-                console.error(error);
-                alert("Server Error");
+            } catch (err) {
+                alert("Error koneksi ke server");
                 btn.innerText = originalText;
                 btn.disabled = false;
+                btn.style.opacity = "1";
             }
         });
-
-        // Auto Resize Textarea biar kayak editor beneran
-        const tx = document.getElementsByTagName("textarea");
-        for (let i = 0; i < tx.length; i++) {
-            tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
-            tx[i].addEventListener("input", OnInput, false);
-        }
-
-        function OnInput() {
-            this.style.height = "auto";
-            this.style.height = (this.scrollHeight) + "px";
-        }
     </script>
+
 </body>
 </html>
