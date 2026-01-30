@@ -7,136 +7,211 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-main: #181818;       
-            --bg-secondary: #262626;  
-            --text-main: #d5d5d5;     
-            --text-muted: #939598;    
-            --accent: #a882ff;        
+            /* OBSIDIAN THEME (Konsisten) */
+            --bg-body: #121212;
+            --bg-nav: #121212;
+            --border: #242424;
+            --bg-secondary: #242424;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #757575;
+            
+            --accent: #a882ff;
             --danger: #ff5f5f;
         }
 
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-main); 
-            color: var(--text-main);
+            background-color: var(--bg-body); 
+            color: var(--text-primary);
             margin: 0; padding: 0;
-            line-height: 1.8; /* Line height gede biar enak baca */
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.2s; }
+
+        /* --- NAVBAR (Sama kayak Index) --- */
+        .navbar {
+            height: 57px; width: 100%;
+            background-color: var(--bg-nav);
+            border-bottom: 1px solid var(--border);
+            position: fixed; top: 0; left: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px;
+        }
+        .brand { 
+            font-family: 'JetBrains Mono', monospace; font-weight: 700; 
+            font-size: 1.1rem; letter-spacing: -0.5px; cursor: pointer;
+        }
+        .nav-right { display: flex; align-items: center; gap: 24px; }
+        .btn-write {
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-secondary); font-size: 0.9rem; font-weight: 400; cursor: pointer;
+        }
+        .btn-write:hover { color: var(--text-primary); }
+        .nav-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            object-fit: cover; cursor: pointer; background: #333;
+        }
+
+        /* --- CONTAINER BACA (Fokus Tengah) --- */
+        .article-container { 
+            max-width: 680px; 
+            margin: 0 auto; 
+            padding: 100px 24px 60px 24px; 
+        }
+
+        /* HEADER ARTIKEL */
+        .post-title { 
+            font-size: 2.8rem; 
+            font-weight: 800; 
+            color: var(--text-primary);
+            margin: 0 0 24px 0; 
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+        }
+
+        /* AUTHOR INFO (Mirip Medium) */
+        .author-meta {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 32px;
+        }
+        .author-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            object-fit: cover; background: #333;
+        }
+        .meta-text { display: flex; flex-direction: column; }
+        .author-name { 
+            font-size: 0.95rem; font-weight: 600; color: var(--text-primary); 
+        }
+        .post-date { 
+            font-size: 0.85rem; color: var(--text-muted); 
+            font-family: 'JetBrains Mono', monospace; margin-top: 2px;
+        }
+
+        /* --- [BARU] HERO IMAGE / COVER --- */
+        .post-cover {
+            width: 100%;
+            height: auto;
+            max-height: 500px; /* Jangan terlalu tinggi biar gak scroll jauh */
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 40px;
+            display: block;
+            background-color: var(--bg-secondary); /* Placeholder pas loading */
+        }
+
+        /* ISI KONTEN (Typography Enak) */
+        .post-content {
+            font-family: 'Merriweather', serif; /* Font serif enak buat baca panjang */
+            font-size: 1.15rem;
+            color: #dcdcdc;
+            line-height: 2; /* Spasi baris lega */
+            white-space: pre-wrap; /* Baca enter/paragraf */
         }
         
-        a { text-decoration: none; color: inherit; transition: 0.2s; }
-        
-        /* HEADER NAV (Konsisten) */
-        .site-header {
-            border-bottom: 1px solid #2f2f2f;
-            padding: 10px 24px;
+        .post-content p { margin-bottom: 24px; }
+
+        /* FOOTER / DELETE */
+        .post-footer {
+            margin-top: 60px; padding-top: 20px;
+            border-top: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .brand { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #fff; font-size: 0.9rem;}
-        .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: none; }
-
-        /* CONTAINER BACA (Lebih sempit dikit biar fokus) */
-        .container { max-width: 680px; margin: 0 auto; padding: 60px 24px; }
-
-        /* HEADER POSTINGAN */
-        .post-header { margin-bottom: 40px; border-bottom: 1px dashed #333; padding-bottom: 20px; }
         
-        .post-title { 
-            font-size: 2.5rem; 
-            font-weight: 800; 
-            color: #fff; 
-            margin: 0 0 15px 0; 
-            line-height: 1.2;
-            letter-spacing: -0.5px;
-        }
-
-        .post-meta {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .author-link { color: var(--accent); text-decoration: none; font-weight: 700; }
-        .author-link:hover { text-decoration: underline; }
-
-        /* ISI KONTEN */
-        .post-content {
-            font-size: 1.1rem;
-            color: #e0e0e0;
-            white-space: pre-wrap; /* Biar enter/paragraf kebaca */
-        }
-
-        /* TOMBOL DELETE (Clean Text) */
         .btn-delete {
-            background: none;
-            border: none;
+            background: none; border: none;
             color: var(--danger);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            cursor: pointer;
-            margin-top: 40px;
-            padding: 0;
-            opacity: 0.7;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+            cursor: pointer; opacity: 0.7; transition: 0.2s;
         }
         .btn-delete:hover { opacity: 1; text-decoration: underline; }
+
+        .tag-pill {
+            background: #242424; padding: 6px 16px; border-radius: 100px; 
+            font-size: 0.8rem; color: #bbb;
+        }
 
     </style>
 </head>
 <body>
 
-    <header class="site-header">
-        <a href="/" class="brand">&larr; Home</a>
-        {{ if .IsLoggedIn }}
-            <a href="/profile">
-                <img src="{{ .UserAvatar }}" class="nav-avatar">
-            </a>
-        {{ end }}
+    <header class="navbar">
+        <a href="/" class="brand">ʕ•ᴥ•ʔ kuma</a>
+        
+        <div class="nav-right">
+            <div class="btn-write" onclick="location.href='/create'">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Write
+            </div>
+
+            {{ if .IsLoggedIn }}
+                {{ if .UserAvatar }}
+                    <img src="{{ .UserAvatar }}" class="nav-avatar" onclick="location.href='/profile'">
+                {{ else }}
+                    <div class="nav-avatar" onclick="location.href='/profile'" style="display:flex; align-items:center; justify-content:center; color:#fff;">?</div>
+                {{ end }}
+            {{ else }}
+                <a href="/login" style="font-weight: 700; color: var(--accent);">Login</a>
+            {{ end }}
+        </div>
     </header>
 
-    <div class="container">
+    <article class="article-container">
         
-        <div class="post-header">
-            <h1 class="post-title">{{ .Post.Title }}</h1>
+        <h1 class="post-title">{{ .Post.Title }}</h1>
+        
+        <div class="author-meta">
+            {{ if .Post.User.Avatar }}
+                <img src="{{ .Post.User.Avatar }}" class="author-avatar" onclick="location.href='/profile?id={{ .Post.User.ID }}'" style="cursor:pointer;">
+            {{ else }}
+                <div class="author-avatar" style="display:flex; align-items:center; justify-content:center;">?</div>
+            {{ end }}
             
-            <div class="post-meta">
-                <span>By</span>
-                <a href="/profile?id={{ .Post.User.ID }}" class="author-link">{{ .Post.User.Name }}</a>
-                <span>•</span>
-                <span>{{ .Post.CreatedAt.Format "02 Jan 2006" }}</span>
+            <div class="meta-text">
+                <a href="/profile?id={{ .Post.User.ID }}" class="author-name">{{ .Post.User.Name }}</a>
+                <span class="post-date">{{ .Post.CreatedAt.Format "Jan 02, 2006" }} · 5 min read</span>
             </div>
         </div>
+
+        {{ if .Post.Image }}
+            <img src="{{ .Post.Image }}" alt="Cover Image" class="post-cover">
+        {{ end }}
 
         <div class="post-content">
             {{ .Post.Content }}
         </div>
 
-        {{ if .IsOwnPost }}
-            <div style="border-top: 1px solid #333; margin-top: 50px; padding-top: 20px;">
-                <span style="font-family:'JetBrains Mono'; font-size: 0.8rem; color: #555;">Author Zone:</span><br>
-<button class="btn-delete" onclick="deletePost('{{ .Post.ID }}')">[ Delete this Log ]</button></div>
-        {{ end }}
+        <div class="post-footer">
+            <span class="tag-pill">Software Engineering</span>
 
-    </div>
+            {{ if .IsOwnPost }}
+                <button class="btn-delete" onclick="deletePost('{{ .Post.ID }}')">[ Delete Log ]</button>
+            {{ end }}
+        </div>
+
+    </article>
 
     <script>
         async function deletePost(id) {
-            if (!confirm("Hapus tulisan ini selamanya?")) return;
+            if (!confirm("Yakin mau hapus cerita ini? Gak bisa balik lho.")) return;
 
             try {
                 const response = await fetch('/api/posts/' + id, { method: 'DELETE' });
                 if (response.ok) {
-                    window.location.href = "/"; // Balik ke Home kalau udah dihapus
+                    window.location.href = "/";
                 } else {
-                    alert("Gagal hapus.");
+                    const data = await response.json();
+                    alert("Gagal hapus: " + data.message);
                 }
             } catch (e) {
-                alert("Error koneksi.");
+                alert("Error koneksi server.");
             }
         }
     </script>
