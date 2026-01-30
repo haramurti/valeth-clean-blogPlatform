@@ -66,7 +66,12 @@ func (h *ProfileHandler) UploadAvatar(c *fiber.Ctx) error {
 	filename := fmt.Sprintf("avatar-%d-%d%s", userID, time.Now().Unix(), ext)
 
 	// 5. UPLOAD KE SUPABASE
-	publicURL, err := h.storage.UploadFile(fileBytes, filename, fileHeader.Header.Get("Content-Type"))
+	publicURL, err := h.storage.UploadFile(
+		fileBytes,
+		filename,
+		fileHeader.Header.Get("Content-Type"),
+		"avatars", // <--- Kirim ke bucket avatars
+	)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Gagal upload ke Supabase: " + err.Error()})
 	}

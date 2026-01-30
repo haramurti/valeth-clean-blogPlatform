@@ -103,7 +103,12 @@ func (h *PostHandler) Store(c *fiber.Ctx) error {
 		filename := fmt.Sprintf("post-%d-%d%s", userID, time.Now().Unix(), ext)
 
 		// Upload ke Supabase
-		imageURL, errUpload := h.storage.UploadFile(fileBytes, filename, fileHeader.Header.Get("Content-Type"))
+		imageURL, errUpload := h.storage.UploadFile(
+			fileBytes,
+			filename,
+			fileHeader.Header.Get("Content-Type"),
+			"posts", // <--- Kirim ke bucket posts
+		)
 		if errUpload != nil {
 			return c.Status(500).JSON(fiber.Map{"message": "Gagal upload gambar: " + errUpload.Error()})
 		}

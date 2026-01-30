@@ -7,145 +7,168 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-main: #121212;       
-            --bg-secondary: #242424;
-            --bg-input: #1e1e1e;  
-            --text-main: #ffffff;     
-            --text-muted: #939598;    
-            --accent: #a882ff;        
-            --border: #333;
+            /* OBSIDIAN THEME (Sama dengan Index) */
+            --bg-body: #121212;
+            --bg-nav: #121212;
+            --bg-input: #1e1e1e;
+            --bg-hover: rgba(255, 255, 255, 0.08);
+            
+            --border: #242424;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #757575;
+            
+            --accent: #a882ff;
         }
 
         * { box-sizing: border-box; }
 
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-main); 
-            color: var(--text-main);
+            background-color: var(--bg-body); 
+            color: var(--text-primary);
             margin: 0; padding: 0;
             line-height: 1.6;
         }
 
         /* --- NAVBAR --- */
         .navbar {
-            height: 60px;
-            background-color: var(--bg-main);
+            height: 57px; 
+            background-color: var(--bg-nav);
             border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 24px; position: sticky; top: 0; z-index: 100;
         }
+        
         .brand { 
-            font-family: 'JetBrains Mono', monospace; font-weight: 700; 
-            color: #fff; text-decoration: none; 
+            font-family: 'JetBrains Mono', monospace; 
+            font-weight: 700; font-size: 1.1rem; letter-spacing: -0.5px;
+            color: var(--text-primary); text-decoration: none; 
+            cursor: pointer;
         }
-        .nav-right a {
-            text-decoration: none; color: var(--text-muted); font-size: 0.9rem;
-            margin-left: 20px; transition: 0.2s;
-        }
-        .nav-right a:hover { color: #fff; }
 
-        /* --- CONTAINER UTAMA --- */
+        .nav-action {
+            font-size: 0.9rem; color: var(--text-muted); text-decoration: none;
+            transition: 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .nav-action:hover { color: var(--text-primary); }
+
+        /* --- CONTAINER --- */
         .container { 
             max-width: 720px; 
             margin: 40px auto; 
             padding: 0 24px; 
         }
 
-        h1 { margin-bottom: 30px; font-weight: 800; letter-spacing: -1px; }
+        h1 { 
+            margin-bottom: 30px; font-weight: 800; font-size: 2rem;
+            letter-spacing: -0.02em; color: var(--text-primary);
+        }
 
         /* --- FORM STYLES --- */
         .form-group { margin-bottom: 24px; }
         
         label { 
             display: block; margin-bottom: 8px; 
-            font-weight: 600; color: var(--text-muted); font-size: 0.9rem;
+            font-weight: 600; color: var(--text-secondary); font-size: 0.9rem;
         }
 
         .form-control {
             width: 100%;
             background-color: var(--bg-input);
             border: 1px solid var(--border);
-            color: #fff;
+            color: var(--text-primary);
             padding: 12px 16px;
             border-radius: 8px;
             font-family: 'Inter', sans-serif;
             font-size: 1rem;
-            transition: 0.2s;
+            transition: all 0.2s ease;
             outline: none;
         }
 
-        /* Khusus Textarea */
+        /* Input Focus Effect */
+        .form-control:focus {
+            border-color: var(--accent);
+            background-color: #2a2a2a;
+            box-shadow: 0 0 0 2px rgba(168, 130, 255, 0.1);
+        }
+
         textarea.form-control {
-            min-height: 300px;
+            min-height: 350px;
             line-height: 1.8;
             resize: vertical;
         }
 
-        /* Efek Fokus */
-        .form-control:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(168, 130, 255, 0.1);
-        }
-
-        /* Input File Custom */
+        /* Input File Styling */
         input[type="file"] {
             padding: 10px;
-            font-size: 0.85rem;
-            background: var(--bg-secondary);
+            background: var(--bg-input);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        input[type="file"]::file-selector-button {
+            background: #333;
+            border: none; color: #fff;
+            padding: 6px 12px; margin-right: 10px;
+            border-radius: 4px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
         }
 
-        /* Tombol Publish */
+        /* Button Publish */
         .btn-submit {
             background-color: var(--accent);
-            color: #000;
+            color: #121212;
             font-weight: 700;
             border: none;
-            padding: 12px 24px;
+            padding: 12px 32px;
             border-radius: 50px;
             cursor: pointer;
             font-size: 1rem;
-            transition: 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
             display: inline-block;
         }
         .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(168, 130, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(168, 130, 255, 0.4);
             background-color: #bfa1ff;
+        }
+        .btn-submit:disabled {
+            opacity: 0.7; cursor: not-allowed; transform: none;
         }
 
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
+    <header class="navbar">
         <a href="/" class="brand">ʕ•ᴥ•ʔ kuma</a>
-        <div class="nav-right">
-            <a href="/">Cancel</a>
-        </div>
-    </nav>
+        <a href="/" class="nav-action">Cancel</a>
+    </header>
 
     <div class="container">
-        <h1>Tulis Postingan Baru</h1>
+        <h1>Write New Story</h1>
 
         <form id="createForm" enctype="multipart/form-data">
             
             <div class="form-group">
                 <label>Judul</label>
-                <input type="text" name="title" class="form-control" placeholder="Isikan judul menarik..." required autocomplete="off">
+                <input type="text" name="title" class="form-control" placeholder="Tulis judul yang menarik..." required autocomplete="off">
             </div>
 
             <div class="form-group">
                 <label>Cover Image (Opsional)</label>
-                <input type="file" name="image" class="form-control" accept="image/png, image/jpeg, image/jpg">
-                <small style="color: #555; display: block; margin-top: 5px;">Format: JPG/PNG, Max 5MB</small>
+                <input type="file" name="image" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp">
+                <small style="color: var(--text-muted); display: block; margin-top: 6px; font-size: 0.8rem;">
+                    Format: JPG/PNG/WEBP. Max 5MB.
+                </small>
             </div>
 
             <div class="form-group">
-                <label>Isi Tulisan</label>
+                <label>Isi Cerita</label>
                 <textarea name="content" class="form-control" placeholder="Mulai menulis ceritamu di sini..." required></textarea>
             </div>
 
@@ -157,39 +180,42 @@
         document.getElementById('createForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Ubah text tombol biar user tau lagi loading
+            // 1. UI Feedback: Disable tombol biar gak di-klik 2x
             const btn = document.querySelector('.btn-submit');
             const originalText = btn.innerText;
             btn.innerText = "Publishing...";
             btn.disabled = true;
-            btn.style.opacity = "0.7";
             
-            // Pakai FormData biar bisa kirim File + Text sekaligus
+            // 2. Ambil data form (termasuk File & Text)
+            // 'this' mengacu pada form element
             const formData = new FormData(this); 
 
             try {
+                // 3. Kirim ke Backend
                 const response = await fetch('/api/posts', {
                     method: 'POST',
-                    body: formData // Browser otomatis set header multipart
+                    body: formData // Browser otomatis set header 'multipart/form-data'
                 });
 
                 if (response.ok) {
-                    // Sukses
+                    // 4. Sukses -> Redirect ke Home
                     window.location.href = "/";
                 } else {
+                    // 5. Gagal -> Tampilkan pesan error
                     const data = await response.json();
-                    alert("Gagal: " + (data.message || "Terjadi kesalahan"));
+                    alert("Gagal posting: " + (data.message || "Terjadi kesalahan server"));
                     
                     // Balikin tombol
                     btn.innerText = originalText;
                     btn.disabled = false;
-                    btn.style.opacity = "1";
                 }
             } catch (err) {
-                alert("Error koneksi ke server");
+                console.error(err);
+                alert("Error koneksi internet atau server mati.");
+                
+                // Balikin tombol
                 btn.innerText = originalText;
                 btn.disabled = false;
-                btn.style.opacity = "1";
             }
         });
     </script>
