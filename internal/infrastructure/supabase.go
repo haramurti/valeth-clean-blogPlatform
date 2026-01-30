@@ -15,7 +15,7 @@ type SupabaseStorage struct {
 
 func NewSupabaseStorage() *SupabaseStorage {
 	url := os.Getenv("SUPABASE_URL")
-	key := os.Getenv("SUPABASE_KEY")
+	key := os.Getenv("SUPABASE_KEY") //comments
 
 	if url == "" || key == "" {
 		panic("Supabase URL/Key belum diisi di .env!")
