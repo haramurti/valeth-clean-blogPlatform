@@ -11,12 +11,12 @@
 
     <style>
         :root {
-            /* OBSIDIAN DARK THEME */
-            --bg-body: #121212;
-            --bg-nav: #121212;
-            --bg-hover: rgba(255, 255, 255, 0.08);
-            --border: #242424;
-            --bg-secondary: #242424;
+            /* Warna Transparan buat Glass Effect */
+            --bg-body: #121212; /* Fallback color */
+            --bg-nav: rgba(18, 18, 18, 0.85); /* Navbar agak transparan */
+            --bg-hover: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.1); /* Border lebih halus */
+            --bg-secondary: rgba(255, 255, 255, 0.05);
             
             --text-primary: #ffffff;
             --text-secondary: #b0b0b0;
@@ -38,14 +38,34 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* --- BACKGROUND BLUR EFFECT --- */
+        /* Kita pake pseudo-element buat background gambar biar bisa di-blur */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            
+            /* Ganti URL ini kalau mau gambar lain */
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            
+            /* Efek Blur */
+            filter: blur(20px) brightness(0.4);
+            transform: scale(1.1); /* Biar pinggiran blur gak putih */
+        }
+
         a { text-decoration: none; color: inherit; transition: 0.2s; }
 
         /* =========================================
-           1. TOP NAVBAR (FIXED)
+           1. TOP NAVBAR (GLASSMOPHISM)
         ========================================= */
         .navbar {
             height: 57px; width: 100%;
             background-color: var(--bg-nav);
+            backdrop-filter: blur(10px); /* Blur di belakang navbar */
+            -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
             position: fixed; top: 0; left: 0; z-index: 1000;
             display: flex; align-items: center; justify-content: space-between;
@@ -61,13 +81,15 @@
         }
 
         .search-container {
-            background: #242424; border-radius: 20px;
+            background: rgba(255, 255, 255, 0.07); /* Lebih transparan */
+            border-radius: 20px;
             padding: 6px 12px; display: flex; align-items: center; gap: 10px;
             width: 240px; border: 1px solid transparent; transition: 0.2s;
         }
-        .search-container:focus-within { background: #fff; border-color: #fff; }
-        .search-container:focus-within svg { color: #000; }
-        .search-container:focus-within input { color: #000; }
+        .search-container:focus-within { background: rgba(0,0,0,0.8); border-color: #555; }
+        .search-container:focus-within svg { color: #fff; }
+        .search-container:focus-within input { color: #fff; }
+
         .search-icon { width: 18px; height: 18px; color: var(--text-muted); }
         .search-input {
             background: transparent; border: none; outline: none;
@@ -87,50 +109,63 @@
         }
 
         /* =========================================
-           2. MAIN LAYOUT
+           2. MAIN LAYOUT (GRID) - Updated Size!
         ========================================= */
         .layout-grid {
-            max-width: 1300px; margin: 0 auto; width: 100%;
+            max-width: 1400px; /* Lebarin dikit container utama */
+            margin: 0 auto; 
+            width: 100%;
             display: grid;
-            grid-template-columns: 240px 1fr 368px;
+            
+            /* 👇 UBAH DISINI: Kiri 180px, Kanan 280px (Makin ramping) */
+            grid-template-columns: 180px 1fr 280px; 
+            
             padding-top: 57px;
             min-height: 100vh;
         }
 
-        /* SIDEBAR LEFT */
+        /* --- SIDEBAR KIRI --- */
         .sidebar-left {
             border-right: 1px solid var(--border);
-            padding: 40px 24px 0 0;
+            padding: 40px 12px 0 0; 
             position: sticky; top: 57px; height: calc(100vh - 57px);
         }
-        .menu-list { display: flex; flex-direction: column; gap: 8px; }
+        .menu-list { display: flex; flex-direction: column; gap: 4px; }
         .menu-item {
-            display: flex; align-items: center; gap: 16px;
-            padding: 10px 16px; border-radius: 30px;
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 16px; border-radius: 30px;
             color: var(--text-secondary); cursor: pointer; transition: 0.2s;
         }
         .menu-item:hover { background-color: var(--bg-hover); color: var(--text-primary); }
-        .menu-item.active { font-weight: 600; color: var(--text-primary); }
-        .menu-item svg { width: 24px; height: 24px; stroke-width: 1.5; }
-        .menu-text { font-size: 0.95rem; }
+        .menu-item.active { font-weight: 600; color: var(--text-primary); background-color: rgba(255,255,255,0.05); }
+        .menu-item svg { width: 22px; height: 22px; stroke-width: 1.5; }
+        .menu-text { font-size: 0.9rem; }
 
-        /* CENTER FEED */
+        /* --- CENTER FEED (Highlight Area) --- */
         .feed-center {
-            padding: 40px 60px;
+            padding: 40px 60px; /* Padding lebih lega */
             border-right: 1px solid var(--border);
-            max-width: 720px;
+            max-width: 900px; /* Maksimal lebar konten dinaikin */
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* --- SIDEBAR KANAN --- */
+        .sidebar-right {
+            padding: 40px 0 40px 24px; /* Geser konten agak ke kanan */
+            position: sticky; top: 57px; height: calc(100vh - 57px);
         }
 
         /* --- MEDIUM CARD STYLE --- */
         .medium-card {
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: flex-start; /* Align top biar rapi */
             padding: 24px 0; border-bottom: 1px solid var(--border);
             cursor: pointer; transition: background 0.1s;
         }
         .medium-card:hover .post-title { color: var(--accent); }
 
         .medium-content {
-            flex: 1; padding-right: 24px; display: flex; flex-direction: column; gap: 8px;
+            flex: 1; padding-right: 32px; display: flex; flex-direction: column; gap: 8px;
             min-width: 0;
         }
 
@@ -143,73 +178,66 @@
         .post-date { color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
 
         .post-title {
-            font-size: 1.5rem; font-weight: 800; color: var(--text-primary);
-            line-height: 1.25; margin: 0; letter-spacing: -0.01em;
+            font-size: 1.6rem; font-weight: 800; color: var(--text-primary);
+            line-height: 1.25; margin: 0; letter-spacing: -0.02em;
         }
         .post-desc {
-            font-family: 'Inter', sans-serif; font-size: 0.95rem; color: var(--text-secondary);
-            line-height: 1.5; margin: 0;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            font-family: 'Inter', sans-serif; font-size: 1rem; color: var(--text-secondary);
+            line-height: 1.6; margin: 0;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
             overflow: hidden; text-overflow: ellipsis;
         }
 
         /* FOOTER KARTU & ICONS */
         .medium-footer {
-            margin-top: 16px;
+            margin-top: 20px;
             display: flex; align-items: center; justify-content: space-between;
             gap: 16px;
         }
 
-        /* Container buat Tags biar rapi berjejer */
-        .tags-wrapper {
-            display: flex; gap: 8px; flex-wrap: wrap;
-        }
+        .tags-wrapper { display: flex; gap: 8px; flex-wrap: wrap; }
         
         .tag-pill {
-            background: #242424; padding: 4px 12px; border-radius: 100px; 
-            font-size: 0.75rem; color: #bbb;
+            background: rgba(255,255,255,0.08); padding: 4px 12px; border-radius: 100px; 
+            font-size: 0.75rem; color: #ccc; transition: 0.2s;
         }
+        .tag-pill:hover { background: rgba(255,255,255,0.15); color: #fff; }
 
-        /* Style Icons (Comment & Bookmark) */
         .footer-icons { display: flex; gap: 16px; align-items: center; flex-shrink: 0; }
         .icon-btn { background: none; border: none; padding: 0; cursor: pointer; display: flex; }
         .icon-img { 
             width: 20px; height: 20px; 
-            opacity: 0.6; filter: invert(1); transition: 0.2s; 
+            opacity: 0.7; filter: invert(1); transition: 0.2s; 
         }
         .icon-btn:hover .icon-img { opacity: 1; }
-        /* Style pas aktif (misal bookmark diklik) */
         .icon-btn.active .icon-img { 
-            filter: invert(0.5) sepia(1) saturate(5) hue-rotate(230deg); 
-            opacity: 1; 
+            filter: invert(0.5) sepia(1) saturate(5) hue-rotate(230deg); opacity: 1; 
         }
 
         /* GAMBAR KANAN */
         .medium-image-box {
-            width: 160px; height: 106px; flex-shrink: 0;
-            border-radius: 4px; overflow: hidden; background: var(--bg-secondary);
+            width: 160px; height: 120px; flex-shrink: 0; /* Sedikit lebih tinggi */
+            border-radius: 8px; overflow: hidden; background: var(--bg-secondary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .medium-thumbnail { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .medium-thumbnail { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
+        .medium-card:hover .medium-thumbnail { transform: scale(1.05); }
 
-        /* SIDEBAR RIGHT */
-        .sidebar-right {
-            padding: 40px 0 40px 40px;
-            position: sticky; top: 57px; height: calc(100vh - 57px);
-        }
-        .widget-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 24px; color: #fff; }
-        .rec-list { display: flex; flex-direction: column; gap: 24px; }
+        /* WIDGET KANAN */
+        .widget-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 20px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; }
+        .rec-list { display: flex; flex-direction: column; gap: 20px; }
         .rec-item { cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
         .rec-meta { display: flex; align-items: center; gap: 8px; }
         .rec-avatar { width: 20px; height: 20px; border-radius: 50%; background: #333; object-fit: cover;}
         .rec-author { font-size: 0.8rem; font-weight: 500; color: #fff; }
-        .rec-headline { font-weight: 700; line-height: 1.4; font-size: 0.95rem; color: var(--text-primary); }
+        .rec-headline { font-weight: 700; line-height: 1.4; font-size: 0.9rem; color: var(--text-primary); }
         .rec-headline:hover { color: var(--accent); }
-        .topics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 40px; }
+        .topics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
         .topic-tag { 
-            background: #242424; padding: 8px 16px; border-radius: 20px; 
-            font-size: 0.85rem; color: var(--text-secondary); cursor: pointer;
+            background: rgba(255,255,255,0.08); padding: 8px 16px; border-radius: 20px; 
+            font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; border: 1px solid transparent; transition: 0.2s;
         }
-        .topic-tag:hover { background: #333; color: #fff; }
+        .topic-tag:hover { border-color: rgba(255,255,255,0.2); color: #fff; background: rgba(255,255,255,0.1); }
 
         @media (max-width: 1080px) {
             .layout-grid { grid-template-columns: 80px 1fr 0; }
@@ -305,7 +333,7 @@
                             <button class="icon-btn" onclick="event.stopPropagation(); location.href='/post?id={{ .ID }}'">
                                 <img src="/static/images/Comment-2.svg" class="icon-img">
                             </button>
-                            <button class="icon-btn" onclick="event.stopPropagation(); toggleIcon(this)">
+                            <button class="icon-btn" onclick="event.stopPropagation(); toggleIcon(this, '{{ .ID }}')">
                                 <img src="/static/images/Bookmark-2.svg" 
                                      data-default="/static/images/Bookmark-2.svg" 
                                      data-active="/static/images/Bookmark-3.svg" 
@@ -323,7 +351,7 @@
 
             </div>
             {{ else }}
-                <div style="text-align: center; color: var(--text-muted); padding: 50px;">
+                <div style="text-align: center; color: rgba(255,255,255,0.5); padding: 50px;">
                     ~ No stories yet ~
                 </div>
             {{ end }}
@@ -331,7 +359,7 @@
         </main>
 
         <aside class="sidebar-right">
-            <div class="widget-title">Author Recommendations 🥞</div>
+            <div class="widget-title">Author Recommendations</div>
             <div class="rec-list">
                 {{ range $index, $element := .Posts }}
                     {{ if lt $index 3 }}
@@ -361,17 +389,35 @@
     </div>
 
     <script>
-        function toggleIcon(btn) {
+        async function toggleIcon(btn, postID) {
+            // 1. Efek Visual Cepat (Optimistic UI)
             btn.classList.toggle('active');
             let isActive = btn.classList.contains('active');
             let img = btn.querySelector('img');
-            // Logic ganti icon
+            
             if (isActive) img.src = img.getAttribute('data-active');
             else img.src = img.getAttribute('data-default');
             
-            // Efek mentul-mentul
             img.style.transform = "scale(1.2)";
             setTimeout(() => { img.style.transform = "scale(1)"; }, 150);
+
+            // 2. Kirim ke Backend
+            try {
+                // Pastikan route ini sudah ada di backend lu
+                const response = await fetch('/api/bookmarks/' + postID, {
+                    method: 'POST'
+                });
+                
+                if (!response.ok) {
+                    // Kalau gagal (misal 401 Unauthorized), balikin visualnya
+                    alert("Gagal bookmark. Silakan login dulu.");
+                    btn.classList.toggle('active');
+                    if (!isActive) img.src = img.getAttribute('data-active');
+                    else img.src = img.getAttribute('data-default');
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
         }
     </script>
 </body>
