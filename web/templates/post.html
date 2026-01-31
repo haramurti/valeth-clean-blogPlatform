@@ -95,16 +95,16 @@
             font-family: 'JetBrains Mono', monospace; margin-top: 2px;
         }
 
-        /* --- [BARU] HERO IMAGE / COVER --- */
+        /* HERO IMAGE / COVER */
         .post-cover {
             width: 100%;
             height: auto;
-            max-height: 500px; /* Jangan terlalu tinggi biar gak scroll jauh */
+            max-height: 500px;
             object-fit: cover;
             border-radius: 4px;
             margin-bottom: 40px;
             display: block;
-            background-color: var(--bg-secondary); /* Placeholder pas loading */
+            background-color: var(--bg-secondary);
         }
 
         /* ISI KONTEN (Typography Enak) */
@@ -125,6 +125,16 @@
             display: flex; justify-content: space-between; align-items: center;
         }
         
+        /* [BARU] Wrapper Tags biar rapi */
+        .tags-wrapper {
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+
+        .tag-pill {
+            background: #242424; padding: 6px 16px; border-radius: 100px; 
+            font-size: 0.8rem; color: #bbb;
+        }
+        
         .btn-delete {
             background: none; border: none;
             color: var(--danger);
@@ -132,11 +142,6 @@
             cursor: pointer; opacity: 0.7; transition: 0.2s;
         }
         .btn-delete:hover { opacity: 1; text-decoration: underline; }
-
-        .tag-pill {
-            background: #242424; padding: 6px 16px; border-radius: 100px; 
-            font-size: 0.8rem; color: #bbb;
-        }
 
     </style>
 </head>
@@ -189,7 +194,14 @@
         </div>
 
         <div class="post-footer">
-            <span class="tag-pill">Software Engineering</span>
+            
+            <div class="tags-wrapper">
+                {{ range .Post.Tags }}
+                    <span class="tag-pill">{{ . }}</span>
+                {{ else }}
+                    <span class="tag-pill">#story</span>
+                {{ end }}
+            </div>
 
             {{ if .IsOwnPost }}
                 <button class="btn-delete" onclick="deletePost('{{ .Post.ID }}')">[ Delete Log ]</button>

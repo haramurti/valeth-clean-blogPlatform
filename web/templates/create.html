@@ -160,6 +160,14 @@
             </div>
 
             <div class="form-group">
+                <label>Tags</label>
+                <input type="text" name="tags" class="form-control" placeholder="Contoh: coding, golang, tutorial (pisahkan dengan koma)" autocomplete="off">
+                <small style="color: var(--text-muted); display: block; margin-top: 6px; font-size: 0.8rem;">
+                    Pisahkan tag dengan tanda koma ( , )
+                </small>
+            </div>
+
+            <div class="form-group">
                 <label>Cover Image (Opsional)</label>
                 <input type="file" name="image" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp">
                 <small style="color: var(--text-muted); display: block; margin-top: 6px; font-size: 0.8rem;">
@@ -188,6 +196,7 @@
             
             // 2. Ambil data form (termasuk File & Text)
             // 'this' mengacu pada form element
+            // (Input 'tags' otomatis masuk karena punya atribut name="tags")
             const formData = new FormData(this); 
 
             try {

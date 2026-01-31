@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"strings"
 	"time"
 	"valeth-clean-blogPlatform/internal/domain"
 	"valeth-clean-blogPlatform/internal/infrastructure"
@@ -74,64 +75,63 @@ func (h *PostHandler) Fetch(c *fiber.Ctx) error {
 }
 
 func (h *PostHandler) Store(c *fiber.Ctx) error {
-	// 1. Siapin piring kosong
 	var post domain.Post
 
-	// 2. Dapet bahan bahan dari user.
-	// Tamu ngirim JSON: {"title": "Halo", "content": "..."}
-	// Kita tuang ke piring 'post'
-
+	// 1. Parsing dasar (Title, Content)
 	if err := c.BodyParser(&post); err != nil {
-		// if tamunya ngirim sampah (JSON rusak), marahin (Bad Request)
-		return c.Status(400).JSON(fiber.Map{
-			"message": "Data lu ngaco bro: " + err.Error(),
-		})
+		return c.Status(400).JSON(fiber.Map{"message": "Data error: " + err.Error()})
 	}
 
-	fileHeader, err := c.FormFile("image")
+	// 2. --- LOGIC TAGS (BARU) ---
+	// Ambil string mentah dari form, misal: "golang, tutorial, backend"
+	tagsRaw := c.FormValue("tags")
 
-	// Kalau tidak error (artinya ada file), kita upload
+	if tagsRaw != "" {
+		// Pecah berdasarkan koma
+		splitted := strings.Split(tagsRaw, ",")
+
+		// Bersihkan spasi (Trim) di setiap tag
+		var cleanTags []string
+		for _, t := range splitted {
+			trimmed := strings.TrimSpace(t)
+			if trimmed != "" {
+				cleanTags = append(cleanTags, trimmed)
+			}
+		}
+
+		// Masukin ke struct
+		post.Tags = cleanTags
+	}
+	// ----------------------------
+
+	// 3. Logic Upload Gambar (Sama kayak sebelumnya)
+	fileHeader, err := c.FormFile("image")
 	if err == nil {
 		file, _ := fileHeader.Open()
 		defer file.Close()
 
-		fileBytes, _ := io.ReadAll(file) // Baca file jadi bytes
+		fileBytes, _ := io.ReadAll(file)
 
-		// Bikin nama unik: post-USERID-TIMESTAMP.jpg
 		userID := c.Locals("user_id").(int)
 		ext := filepath.Ext(fileHeader.Filename)
 		filename := fmt.Sprintf("post-%d-%d%s", userID, time.Now().Unix(), ext)
 
-		// Upload ke Supabase
-		imageURL, errUpload := h.storage.UploadFile(
-			fileBytes,
-			filename,
-			fileHeader.Header.Get("Content-Type"),
-			"posts", // <--- Kirim ke bucket posts
-		)
+		imageURL, errUpload := h.storage.UploadFile(fileBytes, filename, fileHeader.Header.Get("Content-Type"), "posts")
 		if errUpload != nil {
 			return c.Status(500).JSON(fiber.Map{"message": "Gagal upload gambar: " + errUpload.Error()})
 		}
-
-		// Simpan URL ke struct Post
 		post.Image = imageURL
 	}
-	userID := c.Locals("user_id").(int) // Assert ke int
 
+	// 4. Set User ID & Simpan
+	userID := c.Locals("user_id").(int)
 	post.UserID = uint(userID)
 
-	//3. Kasih ke Manajer ngasih tau
 	if err := h.postUseCase.Store(&post); err != nil {
-		// Manajer ngecheck kenapa ini kosong (misal judul kosong)
-		return c.Status(500).JSON(fiber.Map{
-			"message": err.Error(),
-		})
+		return c.Status(500).JSON(fiber.Map{"message": err.Error()})
 	}
 
-	// 4. Berhasil (201 Created)
-	return c.Status(201).JSON(fiber.Map{
-		"message": "Mantap, postingan udah tayang!",
-	})
+	return c.Status(201).JSON(fiber.Map{"message": "Mantap, postingan tayang dengan tags!"})
 }
 
 func (h *PostHandler) GetByID(c *fiber.Ctx) error {
