@@ -18,19 +18,21 @@ func NewPostgresPostRepository(Conn *gorm.DB) domain.PostRepository {
 func (m *postgresPostRepository) Fetch(search string) ([]domain.Post, error) {
 	var posts []domain.Post
 
-	// 1. Joins("User"): Gabungin tabel Users biar bisa difilter
-	// 2. Preload("User"): Masukin data User ke struct Post (biar bisa ditampilin di JSON/HTML)
-	// 3. Debug(): Biar keliatan query SQL-nya di terminal (Hapus nanti kalo udah production)
+	// Query dasar: Gabungin User
 	query := m.Conn.Debug().Preload("User").Joins("User")
 
 	if search != "" {
+		// Ubah search term jadi lowercase biar gak case-sensitive
 		term := "%" + strings.ToLower(search) + "%"
 
-		// --- PERBAIKAN DISINI ---
-		// Ganti "User".name jadi users.name (sesuai nama tabel asli di Postgres)
+		// --- BAGIAN INI YANG KITA UPDATE ---
+		// Kita tambahkan logika OR array_to_string(...)
 		query = query.Where(
-			"LOWER(posts.title) LIKE ? OR LOWER(posts.content) LIKE ? OR LOWER(\"User\".name) LIKE ?",
-			term, term, term,
+			`LOWER(posts.title) LIKE ? 
+			OR LOWER(posts.content) LIKE ? 
+			OR LOWER("User".name) LIKE ? 
+			OR array_to_string(posts.tags, ',') ILIKE ?`, // 👈 INI BARU
+			term, term, term, term, // 👈 Jangan lupa tambah variabel term ke-4
 		)
 	}
 
