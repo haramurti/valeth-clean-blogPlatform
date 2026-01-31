@@ -157,14 +157,21 @@
         .medium-footer {
             margin-top: 16px;
             display: flex; align-items: center; justify-content: space-between;
+            gap: 16px;
         }
+
+        /* Container buat Tags biar rapi berjejer */
+        .tags-wrapper {
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        
         .tag-pill {
             background: #242424; padding: 4px 12px; border-radius: 100px; 
             font-size: 0.75rem; color: #bbb;
         }
 
         /* Style Icons (Comment & Bookmark) */
-        .footer-icons { display: flex; gap: 16px; align-items: center; }
+        .footer-icons { display: flex; gap: 16px; align-items: center; flex-shrink: 0; }
         .icon-btn { background: none; border: none; padding: 0; cursor: pointer; display: flex; }
         .icon-img { 
             width: 20px; height: 20px; 
@@ -285,8 +292,15 @@
                     <p class="post-desc">{{ .Content }}</p>
 
                     <div class="medium-footer">
-                        <span class="tag-pill">Software</span>
                         
+                        <div class="tags-wrapper">
+                            {{ range .Tags }}
+                                <span class="tag-pill">{{ . }}</span>
+                            {{ else }}
+                                <span class="tag-pill">#story</span>
+                            {{ end }}
+                        </div>
+
                         <div class="footer-icons">
                             <button class="icon-btn" onclick="event.stopPropagation(); location.href='/post?id={{ .ID }}'">
                                 <img src="/static/images/Comment-2.svg" class="icon-img">
