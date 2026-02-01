@@ -13,6 +13,10 @@ type User struct {
 
 	CreatedAt time.Time `json:"created_at"`
 
+	//buat bookmars
+
+	Bookmarks []Post `json:"bookmarks" gorm:"many2many:user_bookmarks;"`
+
 	// Relasi: Satu User bisa punya banyak Post
 	// 'omitempty' biar kalau di-json-kan user gak bawa gerbong postingan kalau gak diminta
 	Posts []Post `json:"posts,omitempty" gorm:"foreignKey:UserID"`
@@ -28,6 +32,8 @@ type UserRepository interface {
 
 	Store(user *User) error // kamis 22 baru ini
 
+	ToggleBookmark(userID int, postID int) error
+	GetBookmarks(userID int) ([]Post, error)
 }
 
 // Kontrak kerja buat Logic User (Business Logic)

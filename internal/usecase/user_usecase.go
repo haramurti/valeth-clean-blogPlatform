@@ -84,9 +84,6 @@ func (u *userUseCase) RegisterManual(user *domain.User) error {
 	user.Password = string(hashedPassword)
 
 	// Set Avatar default kalau kosong
-	if user.Avatar == "" {
-		user.Avatar = "https://api.dicebear.com/9.x/micah/svg?seed=" + user.Name
-	}
 
 	return u.userRepo.Store(user)
 }
@@ -106,4 +103,13 @@ func (u *userUseCase) LoginManual(email, password string) (*domain.User, error) 
 	}
 
 	return user, nil
+}
+
+// Implementasi
+func (u *userUseCase) ToggleBookmark(userID int, postID int) error {
+	return u.userRepo.ToggleBookmark(userID, postID)
+}
+
+func (u *userUseCase) GetBookmarks(userID int) ([]domain.Post, error) {
+	return u.userRepo.GetBookmarks(userID)
 }
