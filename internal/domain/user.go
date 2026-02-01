@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
 	ID       uint    `json:"id" gorm:"primaryKey"`
@@ -45,4 +47,8 @@ type UserUseCase interface {
 
 	RegisterManual(user *User) error                   //baru ini kamis 22
 	LoginManual(email, password string) (*User, error) //baru ini kamis 22
+
+	//baru buat bookmark
+	ToggleBookmark(userID int, postID int) error
+	GetBookmarks(userID int) ([]Post, error)
 }

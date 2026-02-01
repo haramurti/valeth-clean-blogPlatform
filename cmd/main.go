@@ -4,12 +4,9 @@ import (
 	"log"
 	"valeth-clean-blogPlatform/config"
 
-	// 👇 PERBAIKAN 1: Kasih alias "httpDelivery" disini
+	// Alias buat http delivery biar gak konflik
 	httpDelivery "valeth-clean-blogPlatform/internal/delivery/http"
-
-	// 👇 PERBAIKAN 2: Benerin typo "infrasturcture" jadi "infrastructure"
 	"valeth-clean-blogPlatform/internal/infrastructure"
-
 	"valeth-clean-blogPlatform/internal/repository"
 	"valeth-clean-blogPlatform/internal/usecase"
 
@@ -20,7 +17,7 @@ import (
 )
 
 func main() {
-	// 1. Setup Config & DB Dulu (Sebaiknya load env paling atas)
+	// 1. Setup Config & DB
 	godotenv.Load()
 	db, err := config.NewDatabase()
 	if err != nil {
@@ -35,7 +32,7 @@ func main() {
 
 	// 3. Setup Supabase Storage
 	supabaseStorage := infrastructure.NewSupabaseStorage()
-	supabaseStorage.InitializeBucket()
+	// supabaseStorage.InitializeBucket() // (Opsional, boleh dinyalain buat ngecek koneksi)
 
 	// 4. Setup Dependency Injection (Repo & Usecase)
 	userRepo := repository.NewPostgresUserRepository(db)
@@ -45,16 +42,17 @@ func main() {
 	postUseCase := usecase.NewPostUseCase(postRepo)
 
 	// 5. Setup Handler (Delivery)
-	// 👇 PERBAIKAN 3: Panggil semuanya pake alias "httpDelivery"
 
 	// Auth Handler
 	httpDelivery.NewAuthHandler(app, userUseCase)
 
-	// Profile Handler (Fitur Upload Baru)
+	// Profile Handler
 	httpDelivery.NewProfileHandler(app, userUseCase, supabaseStorage)
 
 	// Post Handler
-	httpDelivery.NewPostHandler(app, postUseCase, supabaseStorage)
+	// 👇 PERBAIKAN PENTING: Tambahkan 'userUseCase' di sini!
+	// Urutannya harus sama dengan definisi di NewPostHandler
+	httpDelivery.NewPostHandler(app, postUseCase, userUseCase, supabaseStorage)
 
 	// 6. Jalanin Server
 	log.Println("Server jalan di port 8080 bos!")

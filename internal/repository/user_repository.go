@@ -60,29 +60,42 @@ func (r *postgresUserRepository) Store(user *domain.User) error {
 
 //fitur baru buat bookmark
 
+// ... import dan kode atas biarkan saja ...
+
+// 5. Toggle Bookmark (VERSI FIX)
 func (r *postgresUserRepository) ToggleBookmark(userID int, postID int) error {
 	var user domain.User
 
-	// Cari User dulu
+	// 1. Cari User
 	if err := r.Conn.First(&user, userID).Error; err != nil {
 		return err
 	}
 
-	// Siapkan asosiasi ke "Bookmarks"
-	association := r.Conn.Model(&user).Association("Bookmarks")
+	// 2. CEK MANUAL KE TABEL JOIN (user_bookmarks)
+	// Kita hitung apakah pasangan userID & postID ini ada di database?
+	var count int64
+	err := r.Conn.Table("user_bookmarks").
+		Where("user_id = ? AND post_id = ?", userID, postID).
+		Count(&count).Error
 
-	// Bikin objek post dummy cuma buat referensi ID
-	post := domain.Post{ID: uint(postID)}
-
-	// Cek: Apakah post ini udah ada di bookmark si user?
-	if association.Find(&post); post.ID != 0 {
-		// Kalau ketemu (ID tidak 0/exist), berarti mau UN-BOOKMARK (Hapus)
-		return association.Delete(&post)
+	if err != nil {
+		return err
 	}
 
-	// Kalau gak ketemu, berarti mau BOOKMARK (Simpan)
-	return association.Append(&post)
+	// Siapkan objek post dummy
+	post := domain.Post{ID: uint(postID)}
+
+	// 3. Logic Toggle
+	if count > 0 {
+		// Count > 0 artinya SUDAH ADA -> Lakukan HAPUS (Unbookmark)
+		return r.Conn.Model(&user).Association("Bookmarks").Delete(&post)
+	}
+
+	// Count == 0 artinya BELUM ADA -> Lakukan TAMBAH (Bookmark)
+	return r.Conn.Model(&user).Association("Bookmarks").Append(&post)
 }
+
+// ... fungsi GetBookmarks biarkan saja ...
 
 // 6. Ambil Daftar Bookmark User
 func (r *postgresUserRepository) GetBookmarks(userID int) ([]domain.Post, error) {

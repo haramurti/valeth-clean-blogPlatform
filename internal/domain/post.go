@@ -61,6 +61,8 @@ type Post struct {
 	UserID    uint      `json:"user_id"`
 	User      User      `json:"user,omitempty" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Image     string    `json:"image" form:"image"`
+
+	IsBookmarked bool `json:"is_bookmarked" gorm:"-"`
 }
 
 type PostRepository interface {
