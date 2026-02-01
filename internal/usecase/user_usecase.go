@@ -105,11 +105,12 @@ func (u *userUseCase) LoginManual(email, password string) (*domain.User, error) 
 	return user, nil
 }
 
-// Implementasi
 func (u *userUseCase) ToggleBookmark(userID int, postID int) error {
+	// Manajer nyuruh Repository (Gudang) buat simpan/hapus
 	return u.userRepo.ToggleBookmark(userID, postID)
 }
 
 func (u *userUseCase) GetBookmarks(userID int) ([]domain.Post, error) {
+	// Manajer nyuruh Repository ambil data bookmark
 	return u.userRepo.GetBookmarks(userID)
 }
