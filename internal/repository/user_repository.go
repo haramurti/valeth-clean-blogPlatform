@@ -57,3 +57,44 @@ func (r *postgresUserRepository) Store(user *domain.User) error {
 }
 
 // 5. Update Data User (Sync Avatar)
+
+//fitur baru buat bookmark
+
+func (r *postgresUserRepository) ToggleBookmark(userID int, postID int) error {
+	var user domain.User
+
+	// Cari User dulu
+	if err := r.Conn.First(&user, userID).Error; err != nil {
+		return err
+	}
+
+	// Siapkan asosiasi ke "Bookmarks"
+	association := r.Conn.Model(&user).Association("Bookmarks")
+
+	// Bikin objek post dummy cuma buat referensi ID
+	post := domain.Post{ID: uint(postID)}
+
+	// Cek: Apakah post ini udah ada di bookmark si user?
+	if association.Find(&post); post.ID != 0 {
+		// Kalau ketemu (ID tidak 0/exist), berarti mau UN-BOOKMARK (Hapus)
+		return association.Delete(&post)
+	}
+
+	// Kalau gak ketemu, berarti mau BOOKMARK (Simpan)
+	return association.Append(&post)
+}
+
+// 6. Ambil Daftar Bookmark User
+func (r *postgresUserRepository) GetBookmarks(userID int) ([]domain.Post, error) {
+	var user domain.User
+
+	// Preload "Bookmarks" -> Ambil postingan yang disimpan
+	// Preload "Bookmarks.User" -> Ambil data penulis dari postingan tersebut
+	err := r.Conn.Preload("Bookmarks").Preload("Bookmarks.User").First(&user, userID).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user.Bookmarks, nil
+}
