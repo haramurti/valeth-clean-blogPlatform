@@ -54,6 +54,11 @@ func main() {
 	// Urutannya harus sama dengan definisi di NewPostHandler
 	httpDelivery.NewPostHandler(app, postUseCase, userUseCase, supabaseStorage)
 
+	//handler comment
+	commentRepo := repository.NewPostgresCommentRepository(db)
+	commentUseCase := usecase.NewCommentUseCase(commentRepo)
+	httpDelivery.NewCommentHandler(app, commentUseCase)
+
 	// 6. Jalanin Server
 	log.Println("Server jalan di port 8080 bos!")
 	app.Listen(":8080")
