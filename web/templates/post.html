@@ -35,6 +35,7 @@
             color: var(--text-primary);
             margin: 0; padding: 0;
             line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scroll */
         }
 
         /* --- BACKGROUND BLUR EFFECT --- */
@@ -119,26 +120,26 @@
             height: auto;
             max-height: 500px;
             object-fit: cover;
-            border-radius: 8px; /* Lebih rounded dikit */
+            border-radius: 8px;
             margin-bottom: 40px;
             display: block;
             background-color: var(--bg-secondary);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3); /* Tambah shadow biar pop */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
         /* ISI KONTEN */
         .post-content {
             font-family: 'Merriweather', serif; 
             font-size: 1.15rem;
-            color: #e0e0e0; /* Sedikit lebih terang biar kontras sama background blur */
+            color: #e0e0e0;
             line-height: 2; 
             white-space: pre-wrap; 
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5); /* Bayangan teks biar makin jelas */
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
         
         .post-content p { margin-bottom: 24px; }
 
-        /* FOOTER / DELETE */
+        /* FOOTER / ACTIONS */
         .post-footer {
             margin-top: 60px; padding-top: 20px;
             border-top: 1px solid var(--border);
@@ -150,7 +151,7 @@
         }
 
         .tag-pill {
-            background: rgba(255,255,255,0.08); /* Transparan */
+            background: rgba(255,255,255,0.08); 
             padding: 6px 16px; border-radius: 100px; 
             font-size: 0.8rem; color: #ccc;
             border: 1px solid transparent; transition: 0.2s;
@@ -160,6 +161,22 @@
             background: rgba(255,255,255,0.15); color: #fff;
         }
         
+        /* Action Buttons (Delete, Comment, Bookmark) */
+        .action-group {
+            display: flex; gap: 16px; align-items: center;
+        }
+
+        .icon-btn { 
+            background: none; border: none; padding: 0; cursor: pointer; display: flex; 
+        }
+        .icon-img { 
+            width: 24px; height: 24px; opacity: 0.7; filter: invert(1); transition: 0.2s; 
+        }
+        .icon-btn:hover .icon-img { opacity: 1; }
+        .icon-btn.active .icon-img { 
+            filter: invert(0.5) sepia(1) saturate(5) hue-rotate(230deg); opacity: 1; 
+        }
+
         .btn-delete {
             background: none; border: none;
             color: var(--danger);
@@ -228,14 +245,72 @@
                 {{ end }}
             </div>
 
-            {{ if .IsOwnPost }}
-                <button class="btn-delete" onclick="deletePost('{{ .Post.ID }}')">[ Delete Log ]</button>
-            {{ end }}
+            <div class="action-group">
+                <button class="icon-btn" onclick="openSidebar('{{ .Post.ID }}')">
+                    <img src="/static/images/Comment-2.svg" class="icon-img" title="Comments">
+                </button>
+
+                <button class="icon-btn {{ if .Post.IsBookmarked }}active{{ end }}" onclick="toggleIcon(this, '{{ .Post.ID }}')">
+                    <img 
+                        src="{{ if .Post.IsBookmarked }}/static/images/Bookmark-3.svg{{ else }}/static/images/Bookmark-2.svg{{ end }}" 
+                        data-default="/static/images/Bookmark-2.svg" 
+                        data-active="/static/images/Bookmark-3.svg" 
+                        class="icon-img"
+                        title="Bookmark"
+                    >
+                </button>
+
+                {{ if .IsOwnPost }}
+                    <button class="btn-delete" onclick="deletePost('{{ .Post.ID }}')">[ Delete ]</button>
+                {{ end }}
+            </div>
         </div>
 
     </article>
 
+    <div id="overlay" onclick="closeSidebar()" style="
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 2000;
+        opacity: 0; visibility: hidden; transition: 0.3s;
+        backdrop-filter: blur(2px);
+    "></div>
+
+    <div id="commentSidebar" style="
+        position: fixed; top: 0; right: -480px; width: 450px; height: 100%;
+        background: #1a1a1a; z-index: 2001;
+        border-left: 1px solid var(--border);
+        transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex; flex-direction: column;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    ">
+        <div style="padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 1.2rem;">Responses (<span id="commentCount">0</span>)</h3>
+            <button onclick="closeSidebar()" style="background:none; border:none; color:white; cursor:pointer; font-size: 1.5rem;">&times;</button>
+        </div>
+
+        <div id="commentList" style="flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+            <div style="text-align: center; color: #777;">Loading...</div>
+        </div>
+
+        <div style="padding: 24px; border-top: 1px solid var(--border); background: #1a1a1a;">
+            {{ if .IsLoggedIn }}
+                <textarea id="commentInput" placeholder="What are your thoughts?" rows="3" style="
+                    width: 100%; background: #2a2a2a; border: none; padding: 12px;
+                    color: white; border-radius: 8px; resize: none; font-family: inherit;
+                    margin-bottom: 12px; outline: none;
+                "></textarea>
+                <button onclick="submitComment()" style="
+                    background: var(--accent); color: white; border: none;
+                    padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; float: right;
+                ">Respond</button>
+            {{ else }}
+                <a href="/login" style="color: var(--accent); font-weight: 600; display: block; text-align: center;">Login to respond</a>
+            {{ end }}
+        </div>
+    </div>
+
     <script>
+        // --- LOGIC DELETE ---
         async function deletePost(id) {
             if (!confirm("Yakin mau hapus cerita ini? Gak bisa balik lho.")) return;
 
@@ -250,6 +325,123 @@
             } catch (e) {
                 alert("Error koneksi server.");
             }
+        }
+
+        // --- LOGIC BOOKMARK ---
+        async function toggleIcon(btn, postID) {
+            btn.classList.toggle('active');
+            let isActive = btn.classList.contains('active');
+            let img = btn.querySelector('img');
+            
+            if (isActive) img.src = img.getAttribute('data-active');
+            else img.src = img.getAttribute('data-default');
+            
+            img.style.transform = "scale(1.2)";
+            setTimeout(() => { img.style.transform = "scale(1)"; }, 150);
+
+            try {
+                const response = await fetch('/api/bookmarks/' + postID, { method: 'POST' });
+                if (!response.ok) {
+                    alert("Gagal bookmark. Login dulu.");
+                    btn.classList.toggle('active');
+                    if (!isActive) img.src = img.getAttribute('data-active');
+                    else img.src = img.getAttribute('data-default');
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        // --- LOGIC SIDEBAR COMMENTS ---
+        let currentPostID = 0;
+
+        async function openSidebar(postID) {
+            currentPostID = postID;
+            
+            // UI Muncul
+            document.getElementById('commentSidebar').style.right = '0';
+            document.getElementById('overlay').style.visibility = 'visible';
+            document.getElementById('overlay').style.opacity = '1';
+            
+            // Reset List
+            const list = document.getElementById('commentList');
+            list.innerHTML = '<div style="text-align:center; color:#777; margin-top:20px;">Loading thoughts...</div>';
+
+            // Fetch Data
+            try {
+                const res = await fetch(`/api/comments/${postID}`);
+                const comments = await res.json();
+                
+                document.getElementById('commentCount').innerText = comments.length;
+                list.innerHTML = '';
+
+                if(comments.length === 0) {
+                    list.innerHTML = '<div style="text-align:center; color:#555; margin-top:40px;">No thoughts yet. Be the first! 🌿</div>';
+                    return;
+                }
+
+                comments.forEach(c => {
+                    const avatar = c.user.avatar || 'https://api.dicebear.com/9.x/micah/svg?seed=' + c.user.name;
+                    const date = new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    
+                    const html = `
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                <img src="${avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                                <div>
+                                    <div style="font-size: 0.9rem; font-weight: 600;">${c.user.name}</div>
+                                    <div style="font-size: 0.75rem; color: #777;">${date}</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.95rem; color: #ddd; line-height: 1.5; white-space: pre-wrap;">${c.content}</div>
+                        </div>
+                    `;
+                    list.innerHTML += html;
+                });
+
+            } catch (e) {
+                console.error(e);
+                list.innerHTML = '<div style="color:red; text-align:center;">Failed to load comments.</div>';
+            }
+        }
+
+        function closeSidebar() {
+            document.getElementById('commentSidebar').style.right = '-480px';
+            document.getElementById('overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('overlay').style.visibility = 'hidden';
+            }, 300);
+        }
+
+        async function submitComment() {
+            const input = document.getElementById('commentInput');
+            const content = input.value.trim();
+            if(!content) return;
+
+            const btn = document.querySelector('#commentSidebar button');
+            const oldText = btn.innerText;
+            btn.innerText = "Posting...";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ post_id: parseInt(currentPostID), content: content })
+                });
+
+                if(res.ok) {
+                    input.value = '';
+                    openSidebar(currentPostID); // Refresh list
+                } else {
+                    alert("Gagal kirim komentar.");
+                }
+            } catch (e) {
+                alert("Error koneksi.");
+            }
+
+            btn.innerText = oldText;
+            btn.disabled = false;
         }
     </script>
 
