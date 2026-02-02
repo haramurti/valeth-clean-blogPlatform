@@ -21,7 +21,7 @@ func NewDatabase() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	err = db.AutoMigrate(&domain.User{}, &domain.Post{})
+	err = db.AutoMigrate(&domain.User{}, &domain.Post{}, &domain.Comment{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to migrate database: %v", err)
 	}
