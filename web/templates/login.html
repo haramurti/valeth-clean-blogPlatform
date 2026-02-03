@@ -3,42 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Access Terminal</title>
+    <title>Access Terminal - Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-body: #050505;
+            --bg-body: #121212; 
             --accent: #a882ff;
             --text-main: #ffffff;
-            --text-muted: #888;
-            --glass-bg: rgba(255, 255, 255, 0.03); /* Kaca Super Tipis */
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-muted: #757575;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
         }
 
         body { 
-            margin: 0; padding: 0;
             font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-body); 
             color: var(--text-main);
-            min-height: 100vh;
+            margin: 0; padding: 0;
             display: flex; align-items: center; justify-content: center;
-            
-            /* Background Gradient Gelap ala Index */
-            background-color: var(--bg-body);
-            background-image: 
-                radial-gradient(circle at 0% 0%, #1a1a2e 0%, transparent 50%), 
-                radial-gradient(circle at 100% 100%, #1a0b1a 0%, transparent 50%);
+            min-height: 100vh;
+            overflow: hidden;
         }
 
-        /* Container Kaca */
+        /* --- BACKGROUND SAMA KAYAK INDEX --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px) brightness(0.4);
+            transform: scale(1.1);
+        }
+
+        /* CONTAINER KACA (OBSIDIAN) */
         .glass-container {
             width: 100%; max-width: 400px;
-            padding: 40px;
+            padding: 40px 30px;
             
-            /* Efek Blur Glassmorphism */
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
+            background: var(--glass-bg); /* Transparan */
+            backdrop-filter: blur(10px); /* Blur isinya */
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
             border-radius: 16px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             text-align: center;
@@ -46,21 +54,21 @@
 
         h1 { 
             font-family: 'JetBrains Mono', monospace; 
-            font-size: 1.5rem; margin: 0 0 8px 0; 
-            letter-spacing: -1px;
+            font-size: 1.5rem; margin: 0 0 10px 0; 
+            letter-spacing: -0.5px;
         }
 
-        .subtitle { 
-            color: var(--text-muted); font-size: 0.85rem; 
-            font-family: 'JetBrains Mono', monospace; margin-bottom: 40px; 
+        p.subtitle {
+            font-size: 0.85rem; color: var(--text-muted); 
+            font-family: 'JetBrains Mono', monospace; margin-bottom: 40px;
         }
         
-        /* Tombol Google */
+        /* TOMBOL GOOGLE */
         .btn-google {
             display: flex; align-items: center; justify-content: center; gap: 12px;
             width: 100%; padding: 14px;
             background: rgba(255, 255, 255, 0.95);
-            color: #000; font-weight: 700; font-family: 'Inter', sans-serif;
+            color: #111; font-weight: 700; font-family: 'Inter', sans-serif;
             text-decoration: none; border-radius: 8px;
             transition: 0.2s; border: none;
         }
@@ -70,15 +78,14 @@
         }
 
         .divider {
-            margin: 30px 0; color: var(--glass-border); font-size: 0.75rem;
+            margin: 30px 0; color: var(--border); font-size: 0.75rem;
             display: flex; align-items: center; justify-content: center; gap: 10px;
             font-family: 'JetBrains Mono', monospace;
         }
         .divider::before, .divider::after {
-            content: ""; height: 1px; background: var(--glass-border); flex: 1;
+            content: ""; height: 1px; background: var(--border); flex: 1;
         }
 
-        /* Links */
         .links { margin-top: 30px; font-size: 0.85rem; color: var(--text-muted); }
         .links a { color: var(--accent); text-decoration: none; transition: 0.2s; font-weight: 500;}
         .links a:hover { color: #fff; text-decoration: underline; }

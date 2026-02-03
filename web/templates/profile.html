@@ -11,57 +11,73 @@
 
     <style>
         :root {
-            --bg-body: #050505;
+            /* Variable sama persis dengan Index */
+            --bg-body: #121212; 
+            --bg-nav: rgba(18, 18, 18, 0.85); 
+            --border: rgba(255, 255, 255, 0.1); 
+            --bg-secondary: rgba(255, 255, 255, 0.05);
+            
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #757575;
+            
             --accent: #a882ff;
-            --text-main: #ffffff;
-            --text-muted: #888;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
             --danger: #ff5f5f;
         }
 
         body { 
             font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-primary);
             margin: 0; padding: 0;
-            color: var(--text-main);
+            line-height: 1.6;
             min-height: 100vh;
-            background-color: var(--bg-body);
-            
-            /* Gradient Background yang Konsisten */
-            background-image: 
-                radial-gradient(circle at 50% 0%, #1a1a2e 0%, transparent 60%);
-            background-attachment: fixed; /* Biar gradient tetep pas discroll */
         }
-        
+
+        /* --- BACKGROUND BLUR EFFECT (SAMA KAYAK INDEX) --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px) brightness(0.4);
+            transform: scale(1.1);
+        }
+
         a { text-decoration: none; color: inherit; transition: 0.2s; }
-        
-        /* NAVBAR GLASS */
-        .site-header {
-            position: sticky; top: 0; z-index: 100;
-            padding: 12px 24px;
-            display: flex; justify-content: space-between; align-items: center;
-            
-            background: rgba(5, 5, 5, 0.7);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-bottom: 1px solid var(--glass-border);
+
+        /* NAVBAR (Glass) */
+        .navbar {
+            height: 57px; width: 100%;
+            background-color: var(--bg-nav);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; left: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px;
         }
-        .brand { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #fff; font-size: 0.9rem;}
-        
+        .brand { 
+            font-family: 'JetBrains Mono', monospace; font-weight: 700; 
+            font-size: 1.1rem; letter-spacing: -0.5px; cursor: pointer;
+        }
         .nav-right { display: flex; align-items: center; gap: 20px; }
         .btn-logout {
-            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
-            color: var(--danger); font-weight: 600; cursor: pointer; opacity: 0.8;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+            color: var(--danger); font-weight: 600; cursor: pointer;
         }
-        .btn-logout:hover { text-decoration: underline; opacity: 1; }
+        .btn-logout:hover { text-decoration: underline; }
         .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
 
         .container { max-width: 720px; margin: 0 auto; padding: 60px 24px; }
 
-        /* PROFILE IDENTITY */
+        /* PROFILE HEADER */
         .profile-header {
             text-align: center; margin-bottom: 60px; padding-bottom: 40px;
-            border-bottom: 1px solid var(--glass-border); 
+            border-bottom: 1px solid var(--border); 
         }
 
         .avatar-wrapper {
@@ -69,6 +85,7 @@
             margin: 0 auto 20px auto; border-radius: 50%; overflow: hidden; 
             border: 4px solid rgba(255,255,255,0.05);
             box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            cursor: pointer;
         }
         .profile-avatar-big { width: 100%; height: 100%; object-fit: cover; display: block; }
         .profile-avatar-placeholder {
@@ -80,64 +97,57 @@
         /* Avatar Overlay */
         .avatar-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.6);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.2s ease; cursor: pointer;
+            opacity: 0; transition: opacity 0.2s ease;
             backdrop-filter: blur(2px);
         }
         .avatar-wrapper:hover .avatar-overlay { opacity: 1; }
-        .camera-icon { width: 24px; height: 24px; color: #fff; margin-bottom: 4px; }
         .overlay-text { font-size: 0.6rem; font-family: 'JetBrains Mono', monospace; color: #fff; text-transform: uppercase; }
 
         .profile-name {
-            font-size: 2.5rem; font-weight: 800; color: #fff; margin: 0; letter-spacing: -1px;
-            background: linear-gradient(to right, #fff, #bbb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 2.2rem; font-weight: 800; color: #fff; margin: 0; letter-spacing: -1px;
         }
         .profile-meta {
             font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;
         }
 
-        /* POST LIST */
-        .post-list { display: flex; flex-direction: column; gap: 24px; }
+        /* POST LIST (Style ala Medium Card di Index) */
+        .post-list { display: flex; flex-direction: column; }
         
-        .post-item-container { 
-            display: flex; justify-content: space-between; align-items: flex-start; 
-            padding: 24px; border-radius: 12px;
-            transition: 0.2s; border: 1px solid transparent;
-            
-            /* Efek Kartu Glass Tipis */
-            background: rgba(255,255,255,0.02);
+        .medium-card {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            padding: 24px 0; border-bottom: 1px solid var(--border);
+            cursor: pointer; transition: background 0.1s;
         }
-        .post-item-container:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: var(--glass-border);
-            transform: translateY(-2px);
+        .medium-card:hover .post-title { color: var(--accent); }
+
+        .medium-content {
+            flex: 1; padding-right: 32px; display: flex; flex-direction: column; gap: 8px;
+            min-width: 0;
         }
 
-        .post-link { display: block; flex-grow: 1; }
-        .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; display: block; }
-        .post-title { font-size: 1.4rem; font-weight: 700; color: #fff; margin: 0 0 8px 0; transition: 0.2s; }
-        .post-item-container:hover .post-title { color: var(--accent); }
-        .post-preview { font-size: 0.95rem; color: #aaa; margin: 0; line-height: 1.6; }
+        .post-date { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; display: block; }
+        .post-title { font-size: 1.4rem; font-weight: 700; color: #fff; margin: 0; transition: 0.2s; line-height: 1.3; }
+        .post-preview { font-size: 0.95rem; color: #b0b0b0; margin: 0; line-height: 1.6; }
         
         .btn-delete {
             background: none; border: none; color: var(--text-muted); 
             font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; cursor: pointer;
-            padding: 8px 12px; opacity: 0; transition: 0.2s; margin-left: 10px;
-            border-radius: 4px;
+            padding: 5px 0; opacity: 0; transition: 0.2s; margin-top: 10px;
         }
-        .post-item-container:hover .btn-delete { opacity: 1; }
-        .btn-delete:hover { color: var(--danger); background: rgba(255, 95, 95, 0.1); }
+        .medium-card:hover .btn-delete { opacity: 1; }
+        .btn-delete:hover { color: var(--danger); }
 
         .empty-state { text-align: center; font-family: 'JetBrains Mono', monospace; color: #444; padding: 60px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-    <header class="site-header">
-        <a href="/" class="brand">&larr; ABORT / HOME</a>
+    <header class="navbar">
+        <div class="nav-left">
+            <a href="/" class="brand">&larr; ABORT / HOME</a>
+        </div>
         
         {{ if .IsLoggedIn }}
             <div class="nav-right">
@@ -161,11 +171,11 @@
 
                 {{ if .IsOwnProfile }}
                     <div class="avatar-overlay">
-                        <svg class="camera-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" style="margin-bottom:4px;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        <span class="overlay-text">Change</span>
+                        <span class="overlay-text">CHANGE</span>
                     </div>
                     <input type="file" id="avatarInput" hidden accept="image/png, image/jpeg, image/jpg">
                 {{ end }}
@@ -183,16 +193,17 @@
 
         <div class="post-list">
             {{ range .Posts }}
-                <div class="post-item-container">
-                    <a href="/post?id={{ .ID }}" class="post-link">
-                        <span class="post-date">{{ .CreatedAt.Format "Jan 02, 2006" }}</span>
-                        <h2 class="post-title">{{ .Title }}</h2>
-                        <p class="post-preview">{{ .Content }}</p>
-                    </a>
-
-                    {{ if $.IsOwnProfile }}
-                        <button class="btn-delete" onclick="confirmDelete('{{ .ID }}')">[ DELETE LOG ]</button>
-                    {{ end }}
+                <div class="medium-card">
+                    <div class="medium-content">
+                        <a href="/post?id={{ .ID }}" class="post-link">
+                            <span class="post-date">{{ .CreatedAt.Format "Jan 02, 2006" }}</span>
+                            <h2 class="post-title">{{ .Title }}</h2>
+                            <p class="post-preview">{{ .Content }}</p>
+                        </a>
+                        {{ if $.IsOwnProfile }}
+                            <button class="btn-delete" onclick="confirmDelete('{{ .ID }}')">[ DELETE LOG ]</button>
+                        {{ end }}
+                    </div>
                 </div>
             {{ else }}
                 <div class="empty-state">

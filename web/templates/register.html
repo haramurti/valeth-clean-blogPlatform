@@ -7,12 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-body: #050505;
+            --bg-body: #121212; 
             --accent: #a882ff;
             --text-main: #ffffff;
-            --text-muted: #888;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-muted: #757575;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
             --input-bg: rgba(0,0,0,0.3);
         }
 
@@ -22,20 +22,29 @@
             color: var(--text-main);
             min-height: 100vh;
             display: flex; align-items: center; justify-content: center;
-            
             background-color: var(--bg-body);
-            background-image: 
-                radial-gradient(circle at 100% 0%, #1a1a2e 0%, transparent 40%), 
-                radial-gradient(circle at 0% 100%, #1a0b1a 0%, transparent 40%);
+        }
+
+        /* BACKGROUND BLUR */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px) brightness(0.4);
+            transform: scale(1.1);
         }
 
         .glass-container {
             width: 100%; max-width: 420px;
             padding: 40px;
             background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
             border-radius: 16px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
@@ -49,7 +58,7 @@
             font-family: 'JetBrains Mono', monospace; margin-bottom: 30px; 
         }
 
-        /* Avatar Google */
+        /* Avatar */
         .avatar-container { text-align: center; margin-bottom: 30px; display: none; }
         .avatar-img { 
             width: 80px; height: 80px; border-radius: 50%; 
@@ -61,7 +70,7 @@
             font-weight: 700; letter-spacing: 1px;
         }
 
-        /* Input Styles */
+        /* Form */
         .form-group { margin-bottom: 20px; }
         label { 
             display: block; font-family: 'JetBrains Mono', monospace; 
@@ -71,7 +80,7 @@
         input {
             width: 100%; padding: 14px; 
             background: var(--input-bg); 
-            border: 1px solid var(--glass-border);
+            border: 1px solid var(--border);
             color: white; font-family: 'Inter', sans-serif; 
             border-radius: 8px; outline: none; transition: 0.2s;
             box-sizing: border-box;
@@ -84,7 +93,7 @@
 
         button {
             width: 100%; padding: 14px; 
-            background: var(--accent); color: #050505; 
+            background: var(--accent); color: #000; 
             font-weight: 700; border: none; border-radius: 8px; 
             cursor: pointer; font-family: 'JetBrains Mono', monospace;
             margin-top: 10px; transition: 0.2s; letter-spacing: 0.5px;
