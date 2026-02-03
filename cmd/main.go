@@ -19,7 +19,9 @@ import (
 
 func main() {
 	// 1. Setup Config & DB
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, using system environment variables")
+	}
 	db, err := config.NewDatabase()
 	if err != nil {
 		log.Fatal("Gagal konek database:", err)
