@@ -7,64 +7,118 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #1e1e1e; --text-main: #dcddde; --text-muted: #787c88;
-            --accent: #a882ff; --border-color: #363636;
+            --bg-body: #121212; 
+            --accent: #a882ff;
+            --text-main: #ffffff;
+            --text-muted: #757575;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
         }
-        body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; }
-        .container { max-width: 400px; margin: 0 auto; margin-top: 80px; } /* Lebih sempit buat login */
-        
-        h1 { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; margin-bottom: 30px; text-align: center; }
-        
-        /* FORM STYLE */
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
-        
-        input {
-            width: 100%; padding: 12px; background: #252526; border: 1px solid var(--border-color);
-            color: white; font-family: 'JetBrains Mono', monospace; border-radius: 4px; outline: none;
-            transition: 0.2s;
-        }
-        input:focus { border-color: var(--accent); }
 
-        button {
-            width: 100%; padding: 12px; background: var(--accent); color: #1e1e1e; font-weight: bold;
-            border: none; border-radius: 4px; cursor: pointer; font-family: 'JetBrains Mono', monospace;
-            margin-top: 10px; transition: 0.2s;
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
-        button:hover { background: #bfa3ff; }
 
-        .links { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); }
-        .links a { color: var(--accent); text-decoration: none; }
-        .links a:hover { text-decoration: underline; }
+        /* --- BACKGROUND SAMA KAYAK INDEX --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px) brightness(0.4);
+            transform: scale(1.1);
+        }
+
+        /* CONTAINER KACA (OBSIDIAN) */
+        .glass-container {
+            width: 100%; max-width: 400px;
+            padding: 40px 30px;
+            
+            background: var(--glass-bg); /* Transparan */
+            backdrop-filter: blur(10px); /* Blur isinya */
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        h1 { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 1.5rem; margin: 0 0 10px 0; 
+            letter-spacing: -0.5px;
+        }
+
+        p.subtitle {
+            font-size: 0.85rem; color: var(--text-muted); 
+            font-family: 'JetBrains Mono', monospace; margin-bottom: 40px;
+        }
+        
+        /* TOMBOL GOOGLE */
+        .btn-google {
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            width: 100%; padding: 14px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #111; font-weight: 700; font-family: 'Inter', sans-serif;
+            text-decoration: none; border-radius: 8px;
+            transition: 0.2s; border: none;
+        }
+        .btn-google:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .divider {
+            margin: 30px 0; color: var(--border); font-size: 0.75rem;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .divider::before, .divider::after {
+            content: ""; height: 1px; background: var(--border); flex: 1;
+        }
+
+        .links { margin-top: 30px; font-size: 0.85rem; color: var(--text-muted); }
+        .links a { color: var(--accent); text-decoration: none; transition: 0.2s; font-weight: 500;}
+        .links a:hover { color: #fff; text-decoration: underline; }
+
+        .nav-back {
+            display: inline-block; margin-top: 40px; 
+            color: var(--text-muted); font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace; text-decoration: none;
+            opacity: 0.5; transition: 0.2s;
+        }
+        .nav-back:hover { opacity: 1; letter-spacing: 1px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>[ SYSTEM_LOGIN ]</h1>
-       <div style="text-align: center;">
-    <p style="margin-bottom: 20px; font-size: 0.9rem; color: #aaa;">
-        Access protocol secured via Google OAuth.
-    </p>
-    
-    <a href="/auth/google" style="
-        display: inline-block;
-        background-color: #fff;
-        color: #1e1e1e;
-        padding: 12px 24px;
-        text-decoration: none;
-        font-weight: bold;
-        font-family: 'Inter', sans-serif;
-        border-radius: 4px;
-        transition: 0.2s;
-    ">
-        [ LOGIN WITH GOOGLE ]
-    </a>
-</div>
+
+    <div class="glass-container">
+        <h1>[ ACCESS_TERMINAL ]</h1>
+        <p class="subtitle">Secure Protocol Login</p>
+
+        <a href="/auth/google" class="btn-google">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            LOGIN WITH GOOGLE
+        </a>
+
+        <div class="divider">OR</div>
+
         <div class="links">
-            New user? <a href="/register">Initialize Protocol</a>
-            <br><br>
-            <a href="/">&larr; Abort / Back Home</a>
+            Initialize new protocol?<br>
+            <a href="/register">Create Identity -></a>
         </div>
+
+        <a href="/" class="nav-back">&larr; ABORT / RETURN HOME</a>
     </div>
+
 </body>
 </html>

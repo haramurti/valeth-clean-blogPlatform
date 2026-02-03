@@ -3,57 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Initialize Protocol - Register</title>
+    <title>Initialize Protocol</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #1e1e1e; --text-main: #dcddde; --text-muted: #787c88;
-            --accent: #a882ff; --border-color: #363636;
+            --bg-body: #121212; 
+            --accent: #a882ff;
+            --text-main: #ffffff;
+            --text-muted: #757575;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(0,0,0,0.3);
         }
-        body { background: var(--bg-main); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; }
-        .container { max-width: 400px; margin: 0 auto; margin-top: 60px; }
-        
-        h1 { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; margin-bottom: 10px; text-align: center; color: #fff; }
-        .subtitle { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 30px; font-family: 'JetBrains Mono', monospace; }
 
-        /* AVATAR DARI GOOGLE */
-        .avatar-container { text-align: center; margin-bottom: 20px; display: none; } /* Hidden by default */
-        .avatar-img { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent); }
+        body { 
+            margin: 0; padding: 0;
+            font-family: 'Inter', sans-serif; 
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background-color: var(--bg-body);
+        }
 
-        /* FORM */
+        /* BACKGROUND BLUR */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px) brightness(0.4);
+            transform: scale(1.1);
+        }
+
+        .glass-container {
+            width: 100%; max-width: 420px;
+            padding: 40px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        h1 { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 1.4rem; margin: 0 0 8px 0; text-align: center;
+        }
+        .subtitle { 
+            text-align: center; color: var(--text-muted); font-size: 0.8rem; 
+            font-family: 'JetBrains Mono', monospace; margin-bottom: 30px; 
+        }
+
+        /* Avatar */
+        .avatar-container { text-align: center; margin-bottom: 30px; display: none; }
+        .avatar-img { 
+            width: 80px; height: 80px; border-radius: 50%; 
+            border: 3px solid var(--accent); 
+            box-shadow: 0 0 20px rgba(168, 130, 255, 0.4);
+        }
+        .google-badge {
+            font-size: 0.7rem; color: var(--accent); margin-top: 10px; 
+            font-weight: 700; letter-spacing: 1px;
+        }
+
+        /* Form */
         .form-group { margin-bottom: 20px; }
-        label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+        label { 
+            display: block; font-family: 'JetBrains Mono', monospace; 
+            font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;
+        }
         
         input {
-            width: 100%; padding: 12px; background: #252526; border: 1px solid var(--border-color);
-            color: white; font-family: 'JetBrains Mono', monospace; border-radius: 4px; outline: none;
-            transition: 0.2s; box-sizing: border-box;
+            width: 100%; padding: 14px; 
+            background: var(--input-bg); 
+            border: 1px solid var(--border);
+            color: white; font-family: 'Inter', sans-serif; 
+            border-radius: 8px; outline: none; transition: 0.2s;
+            box-sizing: border-box;
         }
-        input:focus { border-color: var(--accent); }
-        
-        /* Kalau inputnya Read Only (hasil auto-fill), warnanya bedain dikit */
-        input[readonly] { background: #1a1a1a; color: #666; cursor: not-allowed; border-style: dashed; }
+        input:focus { border-color: var(--accent); background: rgba(0,0,0,0.5); }
+        input[readonly] { 
+            background: rgba(255,255,255,0.02); color: #666; 
+            border-color: transparent; cursor: not-allowed; 
+        }
 
         button {
-            width: 100%; padding: 12px; background: var(--accent); color: #1e1e1e; font-weight: bold;
-            border: none; border-radius: 4px; cursor: pointer; font-family: 'JetBrains Mono', monospace;
-            margin-top: 10px; transition: 0.2s;
+            width: 100%; padding: 14px; 
+            background: var(--accent); color: #000; 
+            font-weight: 700; border: none; border-radius: 8px; 
+            cursor: pointer; font-family: 'JetBrains Mono', monospace;
+            margin-top: 10px; transition: 0.2s; letter-spacing: 0.5px;
         }
-        button:hover { background: #bfa3ff; transform: translateY(-2px); }
+        button:hover { 
+            background: #fff; transform: translateY(-2px); 
+            box-shadow: 0 0 20px rgba(168, 130, 255, 0.3);
+        }
 
-        .links { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); }
-        .links a { color: var(--accent); text-decoration: none; }
+        .links { text-align: center; margin-top: 24px; font-size: 0.8rem; }
+        .links a { color: var(--text-muted); text-decoration: none; transition: 0.2s; }
+        .links a:hover { color: #fff; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="glass-container">
+        
         <div id="avatarArea" class="avatar-container">
             <img id="avatarImg" src="" alt="Google Avatar" class="avatar-img">
-            <p style="font-size: 0.8rem; margin-top: 10px; color: var(--accent);">Google Account Detected</p>
+            <div class="google-badge">IDENTITY DETECTED</div>
         </div>
 
         <h1 id="pageTitle">[ NEW_USER ]</h1>
-        <p class="subtitle">Initialize user protocol to database.</p>
+        <p class="subtitle">Initialize user protocol</p>
 
         <form action="/auth/register-final" method="POST" id="regForm">
             
@@ -84,44 +148,28 @@
     </div>
 
     <script>
-        // 1. Ambil Data dari URL (Query Params)
         const params = new URLSearchParams(window.location.search);
-        
         const googleID = params.get('google_id');
         const email = params.get('email');
         const name = params.get('name');
         const avatar = params.get('avatar');
 
-        // 2. Cek: Apakah ini User dari Google?
         if (googleID) {
-            // --- MODE GOOGLE ---
-            
-            // Isi form otomatis
             document.getElementById('google_id').value = googleID;
             document.getElementById('email').value = email;
             document.getElementById('name').value = name;
             document.getElementById('avatar_url').value = avatar;
-
-            // Kunci form biar gak diedit (Read Only)
             document.getElementById('email').readOnly = true;
-            // document.getElementById('name').readOnly = true; // Nama boleh diedit lah ya
 
-            // Tampilin Avatar
             if(avatar) {
                 document.getElementById('avatarArea').style.display = 'block';
                 document.getElementById('avatarImg').src = avatar;
             }
 
-            // Sembunyiin Password (Google Login gak butuh password)
             document.getElementById('passGroup').style.display = 'none';
-
-            // Ubah teks judul & tombol biar keren
             document.getElementById('pageTitle').innerText = "[ CONFIRM_IDENTITY ]";
             document.getElementById('btnSubmit').innerText = "CONFIRM & ENTER SYSTEM";
-        
         } else {
-            // --- MODE MANUAL (Biasa) ---
-            // Pastikan password wajib diisi
             document.getElementById('password').required = true;
         }
     </script>
