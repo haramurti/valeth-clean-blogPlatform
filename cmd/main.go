@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"valeth-clean-blogPlatform/config"
 
 	// Alias buat http delivery biar gak konflik
@@ -60,6 +61,10 @@ func main() {
 	httpDelivery.NewCommentHandler(app, commentUseCase)
 
 	// 6. Jalanin Server
-	log.Println("Server jalan di port 8080 bos!")
-	app.Listen(":8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	app.Listen(":" + port)
+	log.Println("Server jalan di port:" + port)
 }
