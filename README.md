@@ -1,63 +1,62 @@
 # ʕ•ᴥ•ʔ Kuma Blog
 
-> *"Sebuah platform blog yang dibikin bukan karena butuh tempat curhat, tapi karena butuh validasi kalau gue bisa ngoding Go."*
+> *"Sebuah platform blog yang akhirnya rilis juga, setelah melewati fase 'it works on my machine' berkali-kali."*
 
-![Go](https://img.shields.io/badge/Go-1.23-00ADD8?style=flat&logo=go)
-![Fiber](https://img.shields.io/badge/Fiber-v2-black?style=flat)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-316192?style=flat&logo=postgresql)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker)
+[![Deployment](https://img.shields.io/badge/Status-Live_on_Koyeb-success?style=for-the-badge&logo=koyeb)](https://outdoor-hedi-casio-57ac17f4.koyeb.app/)
 
-## 🤔 Apaan nih?
+## 🌐 Coba Sekarang (Udah Online, Bro!)
 
-Ini adalah **Kuma Blog**. Simpelnya, ini kayak Medium.com tapi versi *lite*, gratisan, dan yang bikin belum dapet pendanaan seri A.
+Gak perlu *clone* repo, gak perlu install Docker, gak perlu menuhin RAM laptop lo. Gue udah deploy ini ke awan (cloud).
 
-Gue bikin ini pakai **Clean Architecture**. Kenapa? Biar kalau ada fitur yang error, gue tau harus nyalahin file yang mana tanpa perlu nangis di pojok kamar. UI-nya pakai konsep *Glassmorphism* (kaca-kaca buram gitu), biar kelihatan futuristik dan estetik, meskipun isinya mungkin cuma tulisan "Hello World".
+👉 **Akses di sini:** [**https://outdoor-hedi-casio-57ac17f4.koyeb.app/**](https://outdoor-hedi-casio-57ac17f4.koyeb.app/)
 
-## ✨ Fitur Unggulan (Yang Lumayan Bikin Pusing)
+*(Kalau loading pertamanya agak lama, maklum ya, server gratisan lagi bangun tidur. Tunggu 10 detik, refresh, nanti dia ngebut lagi kayak gue pas dikejar deadline).*
 
-* **Authentication:** Bisa login pakai **Google OAuth** (karena gue tau lo pasti males ngafalin password baru) atau email biasa.
-* **Clean Writing Space:** Editor teks simpel. Gak banyak tombol aneh-aneh. Fokus nulis, jangan fokus nyari *font* Comic Sans.
-* **Sidebar Comments:** Komentar muncul dari samping ala Medium. UX mahal, modal *JavaScript* native.
-* **Bookmark System:** Simpan tulisan yang mau dibaca nanti (wacana doang biasanya).
-* **Responsive UI:** Jalan mulus di Laptop, HP, maupun kalkulator (kalau ada browsernya).
+---
 
-## 🛠 Teknologi di Balik Layar
+## 🤔 Apaan sih ini?
 
-Dibangun dengan keringat, air mata, dan kopi sachet:
+Ini adalah **Kuma Blog**. Simpelnya, ini kayak Medium.com tapi versi *indie*. Gue bikin ini karena gue pengen punya tempat nulis yang bersih, kenceng, dan gak banyak iklan obat peninggi badan.
 
-* **Backend:** [Go (Golang)](https://go.dev/) + [Fiber](https://gofiber.io/) — Karena hidup udah lambat, web jangan ikutan lambat.
-* **Database:** PostgreSQL (via Supabase) — Nyimpen data mantan... eh, data user.
-* **ORM:** GORM — Biar gak perlu nulis raw SQL panjang-panjang.
-* **Frontend:** Go `html/template` + CSS Native — Gak pake React/Vue. Laki itu ngoding CSS manual.
-* **Deployment:** Docker — Biar gak ada alasan *"It works on my machine"* pas demo.
+Dibangun pakai **Clean Architecture**, jadi kalau lo liat kodingannya, itu rapi banget. Serapi kamar gue kalau lagi mau ada tamu doang.
 
-## 🚀 Cara Jalanin (Buat Lo yang Mau Coba)
+## ✨ Fitur yang Bisa Lo Mainin
 
-Pastikan di laptop lo udah ada **Go** dan **Docker**. Kalau belum, install dulu. Jangan males.
+Pas lo buka link di atas, lo bisa ngapain aja?
+
+1.  **Login via Google:** Gak perlu repot bikin password baru (gue tau lo pasti lupa password lo sendiri). Klik, login, beres.
+2.  **Nulis Cerita:** Ada editor teks yang *distraction-free*. Fokus nulis aja, jangan fokus mikirin dia yang gak bales chat.
+3.  **Komentar Ala Medium:** Coba buka salah satu postingan, terus klik ikon komentar. *Sidebar*-nya bakal muncul dari kanan. UX mahal nih, Bos.
+4.  **Bookmark:** Simpan tulisan yang menarik buat dibaca nanti (wacana).
+5.  **Hapus Tulisan:** Kalau lo nulis sesuatu pas lagi galau terus nyesel, tinggal hapus aja. Jejak digital aman.
+
+## 🛠 Dapur Pacu (Tech Stack)
+
+Biar kelihatan pinter dikit, ini teknologi yang gue pake di belakang layar:
+
+* **Bahasa:** [Go (Golang)](https://go.dev/) — Biar performanya ngebut, gak kayak sinyal di gunung.
+* **Framework:** [Fiber](https://gofiber.io/) — Ringan, kenceng, *expressive*.
+* **Database:** PostgreSQL (via Supabase) — Tempat nyimpen semua curhatan user.
+* **Frontend:** HTML/CSS Native (Glassmorphism Style) — Gak pake React biar *loading*-nya instan.
+* **Deployment:** Docker Container di **Koyeb**.
+
+## 💻 Cara Jalanin di Laptop Sendiri (Kalau Penasaran)
+
+Kalau lo programmer dan pengen ngotak-ngatik isinya di laptop lo (Localhost), silakan:
 
 1.  **Clone Repo ini:**
     ```bash
-    git clone [https://github.com/username-lo/kuma-blog.git](https://github.com/username-lo/kuma-blog.git)
-    cd kuma-blog
+    git clone [https://github.com/username-lo/valeth-clean-blogPlatform.git](https://github.com/username-lo/valeth-clean-blogPlatform.git)
     ```
-
-2.  **Siapin File Rahasia (.env):**
-    Copy file `.env.example` jadi `.env`, terus isi data database & Google Auth lo.
+2.  **Setup Environment:**
+    Copy `.env.example` jadi `.env` terus isi *credentials*-nya.
+3.  **Jalanin Docker:**
     ```bash
-    cp .env.example .env
+    docker build -t kuma-blog .
+    docker run -p 8080:8080 kuma-blog
     ```
-
-3.  **Jalanin via Docker (Jalur VIP):**
-    ```bash
-    docker-compose up --build
-    ```
-
-4.  **Buka Browser:**
-    Akses di `http://localhost:8080`. Selamat, webnya jalan. Kalau error, coba restart laptop, biasanya sembuh.
-
-## 🤝 Kontribusi
-
-Kalau nemu *bug*, tolong *issue*-nya ditulis yang sopan. Kalau mau benerin sendiri (*Pull Request*), gue doain masuk surga.
+4.  **Buka:** `http://localhost:8080`
 
 ---
-*Dibuat oleh [Nama Lo]. Masih jomblo (opsional, hapus kalau udah laku).*
+
+*Dibuat dengan ❤️ dan sedikit ☕ di malam minggu.*
