@@ -60,3 +60,5 @@ Kalau lo programmer dan pengen ngotak-ngatik isinya di laptop lo (Localhost), si
 ---
 
 *Dibuat dengan ❤️ dan sedikit ☕ di malam minggu.*
+
+this project is inspired from roadmap.sh projects https://roadmap.sh/projects/blogging-platform-api
