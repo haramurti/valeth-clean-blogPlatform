@@ -65,7 +65,7 @@ func main() {
 	// 6. Jalanin Server
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8081"
 	}
 	app.Listen(":" + port)
 	log.Println("Server jalan di port:" + port)
