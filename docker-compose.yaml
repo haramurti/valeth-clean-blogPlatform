@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    container_name: blog_app
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    networks:
+      - blog_network
+
+networks:
+  blog_network:
+    driver: bridge
